@@ -1,0 +1,576 @@
+/* man. this file is huge and ugly. Should be cleaned */
+
+@media screen {
+@font-face {
+  font-family: 'Oswald';
+  font-style: normal;
+  font-weight: 300;
+  src: local('Oswald Light'), local('Oswald-Light'), url('../fonts/Oswald-Light.ttf') format('truetype'), url(http://themes.googleusercontent.com/static/fonts/oswald/v7/HqHm7BVC_nzzTui2lzQTDT8E0i7KZn-EPnyo3HZu7kw.woff) format('woff');
+}
+@font-face {
+  font-family: 'Oswald';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Oswald Regular'), local('Oswald-Regular'), url('../fonts/Oswald-Regular.ttf') format('truetype'),  url(http://themes.googleusercontent.com/static/fonts/oswald/v7/-g5pDUSRgvxvOl5u-a_WHw.woff) format('woff');
+}
+@font-face {
+  font-family: 'Oswald';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Oswald Bold'), local('Oswald-Bold'), url('../fonts/Oswald-Bold.ttf') format('truetype'), url(http://themes.googleusercontent.com/static/fonts/oswald/v7/bH7276GfdCjMjApa_dkG6T8E0i7KZn-EPnyo3HZu7kw.woff) format('woff');
+}
+@font-face {
+  font-family: 'Yanone Kaffeesatz';
+  font-style: normal;
+  font-weight: 200;
+  src: local('Yanone Kaffeesatz ExtraLight'), local('YanoneKaffeesatz-ExtraLight'), url('../fonts/YanoneKaffeesatz-ExtraLight.ttf') format('truetype'), url(http://themes.googleusercontent.com/static/fonts/yanonekaffeesatz/v4/We_iSDqttE3etzfdfhuPRYa6iXjgqaxY3DU3RqApPOI.woff) format('woff');
+}
+@font-face {
+  font-family: 'Yanone Kaffeesatz';
+  font-style: normal;
+  font-weight: 300;
+  src: local('Yanone Kaffeesatz Light'), local('YanoneKaffeesatz-Light'), url('../fonts/YanoneKaffeesatz-Light.ttf') format('truetype'), url(http://themes.googleusercontent.com/static/fonts/yanonekaffeesatz/v4/We_iSDqttE3etzfdfhuPRVMR8FhBa8rkfAKaPBwAU3s.woff) format('woff');
+}
+@font-face {
+  font-family: 'Yanone Kaffeesatz';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Yanone Kaffeesatz Regular'), local('YanoneKaffeesatz-Regular'), url('../fonts/YanoneKaffeesatz-Regular.ttf') format('truetype'), url(http://themes.googleusercontent.com/static/fonts/yanonekaffeesatz/v4/YDAoLskQQ5MOAgvHUQCcLRTHiN2BPBirwIkMLKUspj4.woff) format('woff');
+}
+@font-face {
+  font-family: 'Yanone Kaffeesatz';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Yanone Kaffeesatz Bold'), local('YanoneKaffeesatz-Bold'), url('../fonts/YanoneKaffeesatz-Bold.ttf') format('truetype'), url(http://themes.googleusercontent.com/static/fonts/yanonekaffeesatz/v4/We_iSDqttE3etzfdfhuPRWwXwFHHZlCwprwJOQ-Se7k.woff) format('woff');
+}
+}
+
+html,p { margin: 0; padding: 0 }
+body { 
+	margin: 0; 
+	padding: 0; 
+	background: #ebeee6;
+	font-family: 'Yanone Kaffeesatz', Open Sans Condensed Light,Trebuchet MS, sans-serif;
+	min-width: 1024px;
+	width: 100%;
+}
+#container {
+	margin-left: auto;
+	margin-right: auto;
+	margin-bottom: 20px;
+	width: 1024px;
+	padding-left: 50px;
+	-webkit-box-sizing: border-box;
+	position: relative;
+}
+#header {
+	width: 100%;
+	height: 58px;
+	padding: 10px;
+	-webkit-box-sizing: border-box;
+	position: relative;
+}
+
+/* stats */
+#panwheader {
+	color: white;
+	background:url('../images/icon_paper_38.png') no-repeat;
+	padding-left: 48px;
+	font-size: 38px;
+	height: 38px;
+}
+#panwheader span {
+	position: relative;
+	top: -10px;
+	padding: 0;
+	font-family: Oswald, Open Sans Condensed Bold,Trebuchet MS, sans-serif;
+}
+#main {
+	background: white;
+	margin-top: 10px;
+	padding: 10px;
+}
+#mainheader {
+	font-family: Oswald, Open Sans Condensed Bold,Trebuchet MS, sans-serif;
+	font-size: 25px;
+}
+.mainsection {
+	position: relative;
+	border-bottom: 1px solid #000;
+	margin-bottom: 10px;
+	height: 20px;
+}
+.sectiontitle {
+	font-size: 20px;
+	padding-right: 6px;
+	position: absolute;
+	bottom: -10px;
+	background: white;
+}
+#containermenu-tool {
+	top: 0;
+	left: 0;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	text-align: center;
+	width: 45px;
+	position: fixed;
+	border-radius: 2px;
+}
+.menu-icon {
+	background-image: url('/images/menu.png');
+	width: 31px;
+	height: 31px;
+	position: relative;
+	margin: 0 auto;
+}
+#containermenu-tool:hover {
+	-webkit-transition: background 0.5s linear 0;
+	background: #D6D7C2;
+	cursor: pointer;
+}
+#containermenu {
+	top: 0;
+	left: 0;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	font-family: Oswald, Open Sans Condensed Light,Trebuchet MS, sans-serif;
+	font-weight: 300;
+	width: 200px;
+	position: fixed;
+	z-index: 2147483647;
+	background: white;
+	border-radius: 2px;
+	-webkit-box-shadow: 0 0 2px 2px #ccc;
+}
+#containermenu ul {
+	margin: 0;
+	padding: 0;
+}
+#containermenu li {
+	font-size: 20px;
+	list-style-type: none;
+	padding: 0;
+	padding-left: 10px;
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+#containermenu a {
+	text-decoration: none;
+	color: black;
+}
+#containermenu a:hover {
+	text-decoration: underline;
+}
+.containermenu-hide {
+	visibility: hidden;
+}
+.containermenu-show {
+	-webkit-transition: visibility 0.5s linear 0;
+	visibility: visible;
+}
+
+/* login page */
+#loginmain {
+	background: #9db93f;
+	padding: 10px;
+	color: white;
+	border-radius: 2px;
+}
+#loginheader {
+	width: 100%;
+	height: 38px;
+	font-size: 38px;
+	padding-left: 48px;
+	background:url('../images/icon_paper_38.png') no-repeat;
+}
+#loginheader span {
+	position: relative;
+	top: -5px;
+	font-family: Oswald, Open Sans Condensed Bold,Trebuchet MS, sans-serif;
+}
+#loginform {
+	padding-top: 10px;
+	padding-left: 48px;
+	font-size: 20px;
+}
+#loginbtn {
+	margin-top: 10px;
+	padding-right: 15px;
+	padding-left: 15px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	background: #72862E;
+	color: white;
+	text-decoration: none;
+	display: block;
+	width: 50px;
+	text-align: center;
+}
+input.logininput {
+	width: 250px; 
+	border: 1px solid rgba(0,0,0,0.25); 
+	border-radius: 2px; 
+	color: #333; 
+	-webkit-appearance: none;  
+	-webkit-padding-start: 6px;
+}
+#loginmessage {
+	display: none;
+	font-size: 25px;
+	padding-top: 15px;
+	padding-left: 48px;
+}
+#loginmessage a {
+	color: white;
+}
+
+/* monitorlist */
+#device-table {
+	width: 100%;
+	border-collapse: collapse;
+}
+#device-table-header  th {
+	text-align: left;
+	border-bottom: 1px solid #000;
+	font-style: italic;
+	font-weight: normal;
+}
+.device-table-tools {
+	text-align: right;
+}
+.device-table-delete {
+	font-size: 12px;
+	color: black;
+	text-decoration: none;
+}
+.device-table-delete:hover {
+	text-decoration: underline;
+}
+.device-table-link {
+	cursor: pointer;
+}
+
+/* stats */
+#stats-cdown-container {
+	position: absolute;
+	right: 10px;
+	top: 10px;
+	height: 38px;
+	width: 30px;
+	border-radius: 2px;
+	background: rgb(92, 109, 37);
+	box-shadow: 0 2px 2px rgba(0, 0, 0, .3) inset;
+}
+#stats-cdown-bar {
+	margin: 5px;
+	width: 20px;
+	border-radius: 2px;
+	background: white;
+	box-shadow: 0 1px 0 rgba(0, 0, 0, .3),
+              0 2px 2px -1px rgba(0, 0, 0, .5);
+	position: absolute;
+	bottom: 0px;
+	height: 0px;
+}
+#stats-counters {
+	width: 100%;
+	border-collapse: collapse;
+}
+#stats-counters  th {
+	text-align: left;
+	border-bottom: 1px solid #000;
+	font-style: italic;
+	font-weight: normal;
+}
+#stats-counters td {
+	border-bottom: 1px solid #eee;
+}
+#stats-ifs-bpschart {
+	margin: 0;
+	padding: 0;
+	float: left;
+	width: 460px;
+	height: 200px;
+	padding-right: 5px;
+}
+#stats-ifs-ppschart {
+	margin: 0;
+	padding: 0;
+	float: right;
+	width: 460px;
+	height: 200px;
+	padding-left: 5px;
+}
+#stats-ifs-hw {
+	width: 100%;
+	border-collapse: collapse;
+}
+#stats-ifs-hw  th {
+	text-align: left;
+	border-bottom: 1px solid #000;
+	font-style: italic;
+	font-weight: normal;
+}
+#stats-ifs-hw td {
+	border-bottom: 1px solid #ddd;
+}
+#stats-ifs-hw td.noborder {
+	border: 0;
+}
+#stats-ifs-ifnet {
+	width: 100%;
+	border-collapse: collapse;
+}
+#stats-ifs-ifnet  th {
+	text-align: left;
+	border-bottom: 1px solid #000;
+	font-style: italic;
+	font-weight: normal;
+}
+#stats-ifs-ifnet td {
+	border-bottom: 1px solid #ddd;
+}
+#stats-ifs-ifnet td.noborder {
+	border: 0;
+}
+#stats-sessions-current {
+	width: 100%;
+	border-collapse: collapse;	
+}
+#stats-sessions-current td {
+	width: 5%;
+	text-align: center;
+}
+#stats-sessions-deny {
+	width: 465px;
+	height: 200px;
+}
+#stats-sessions-cps {
+	width: 465px;
+	height: 200px;
+}
+#stats-resources-mpcpu {
+	border-collapse: collapse;
+	width: 100%;
+}
+#stats-resources-mpcpu td {
+	width: 5%;
+	text-align: center;
+}
+#stats-resources-mpmemory {
+	width: 100%;
+	border-collapse: collapse;	
+}
+#stats-resources-mpmemory td {
+	width: 5%;
+	text-align: center;
+}
+#stats-resources-mpcpuchart {
+	height: 200px;
+	width: 660px;
+}
+.stats-resources-dpcpu {
+	width: 100%;
+	border-collapse: collapse;	
+}
+.stats-resources-dpcpu td {
+	text-align: center;
+	width: 5%;
+}
+.stats-hchart-tbar span {
+	text-decoration: none;
+	color: black;
+}
+.stats-hchart-tbar span:hover {
+	text-decoration: underline;
+	cursor: pointer;
+}
+.stats-hchart-rsel {
+	text-decoration: underline !important;
+}
+.stats-hchart-full {
+	width: 954px;
+	height: 200px;
+	margin-top: 10px;
+}
+.stats-hchart-half {
+	width: 465px;
+	height: 200px;
+	margin-top: 10px;
+}
+.stats-figure {
+	/* XXX */
+	font-size: 24px;
+}
+.stats-label {
+	font-style: italic;
+}
+.stats-disabled {
+	color: #888;
+}
+.stats-col1 {
+	margin: 0;
+	padding: 0;
+	float: left;
+	width: 49%;
+	padding-right: 5px;
+}
+.stats-col2 {
+	margin: 0;
+	padding: 0;
+	float: right;
+	width: 49%;
+	padding-left: 5px;
+}
+.stats-col1-30 {
+	margin: 0;
+	padding: 0;
+	float: left;
+	width: 29%;
+	padding-right: 5px;
+}
+.stats-col2-70 {
+	margin: 0;
+	padding: 0;
+	float: right;
+	width: 69%;
+	padding-left: 5px;
+}
+
+#stats-sessioninfo-sessions {
+	width: 100%;
+	border-collapse: collapse;
+}
+#stats-sessioninfo-sessions  th {
+	text-align: left;
+	border-bottom: 1px solid #000;
+	font-style: italic;
+	font-weight: normal;
+}
+#stats-sessioninfo-rates {
+	width: 100%;
+	border-collapse: collapse;
+}
+#stats-sessioninfo-rates  th {
+	text-align: left;
+	border-bottom: 1px solid #000;
+	font-style: italic;
+	font-weight: normal;
+}
+#sessioninfo-col1 {
+	margin: 0;
+	padding: 0;
+	float: left;
+	width: 49%;
+	padding-right: 5px;
+}
+#sessioninfo-col2 {
+	margin: 0;
+	padding: 0;
+	float: right;
+	width: 49%;
+	padding-left: 5px;
+}
+
+.value-changed-up {
+	padding-left: 2px;
+	padding-right: 20px;
+	background: url('/images/up.png') 99% center no-repeat;
+	border: 0;
+}
+.value-changed-down {
+	padding-left: 2px;
+	padding-right: 20px;
+	background: url('/images/down.png') 99% center no-repeat;
+	border: 0;
+}
+.value-not-changed {
+	padding-left: 2px;
+	padding-right: 20px;
+	border: 0;
+}
+.chartable {
+	cursor: pointer;
+}
+.chartable:hover {
+	text-decoration: underline;
+}
+
+#loading-overlay {
+	position: fixed;
+	display: none;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: #eee;
+	z-index: 2147483647;
+}
+#loading-wrapper {
+	display: table;
+	position: relative;
+	vertical-align: middle;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+}
+#loading-wrapper div {
+	display: table-cell;
+	vertical-align: middle;
+	text-align: center;
+	font-size: 30px;
+}
+#tc-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0,0,0,0.1);
+	display: none;
+}
+#tc-container {
+	margin: 0 auto;
+	margin-top: 80px;
+	width: 860px;
+	background: white;
+	border-radius: 2px;
+	-webkit-box-shadow: 0 0 2px 2px #ccc;
+	padding: 10px;
+}
+#tc-title {
+	font-size: 20px;
+	font-family: Oswald, Open Sans Condensed Bold,Trebuchet MS, sans-serif;
+}
+#tc-chart {
+	width: 850px;
+	height: 300px;
+}
+#tc-chart-wrap {
+	margin-top: 20px;
+	overflow-y: scroll;
+	overflow-x: hidden;
+}
+#tc-chart-wrap::-webkit-scrollbar {
+    width: 10px;
+    background: transparent;
+    border: 0;
+}
+#tc-chart-wrap::-webkit-scrollbar-thumb {
+	background: #ddd;
+	border: 0;
+}
+#tc-chart-wrap::-webkit-scrollbar {
+    width: 10px;
+}
+.tc-dpcore {
+	width: 850px;
+}
+#tc-hchart-tbar {
+	margin-bottom: 10px;
+}
+.horizonflot {
+	border-top: 1px solid #ddd;
+}

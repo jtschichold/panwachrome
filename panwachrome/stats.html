@@ -1,0 +1,38 @@
+<html>
+	<head>
+		<title>Pan(w)achrome - Statistics</title>
+		<link href="css/panachrome.css" media="all" rel="stylesheet" type="text/css" />
+	</head
+	<body>
+		<div id="header" style="background: #9db93f"><div id="panwheader"><span>Pan(w)achrome - Statistics</span></div><div id="stats-cdown-container"></div></div>
+		<div id="container">
+			<div id="main" style="background: white"><div id="mainheader">Loading...</div></div>
+			<!-- the menu -->
+			<div id="containermenu" class="containermenu-hide">
+				<ul>
+					<li>&gt; <a href="#ifs">Traffic</a></li>
+					<li>&gt; <a href="#sessions">Sessions</a></li>
+					<li>&gt; <a href="#resources">Resources</a></span></li>
+					<li>&gt; <a href="#counters">Counters</a></span></li>
+				</ul>
+			</div>
+			<div id="containermenu-tool"><div class="menu-icon"></div></div>
+		</div>
+		<!-- the chart area -->
+		<div id="tc-overlay">
+			<div id="tc-container">
+				<span id="tc-title">Title</span>
+				<div id="tc-chart-wrap"><div id="tc-chart"></div></div>
+			</div>
+		</div>
+		<div id="loading-overlay"><div id="loading-wrapper"><div id="loading-message">Loading data...</div></div></div>
+		<script type="application/javascript" src="jquery.js"></script>
+		<script type="application/javascript" src="jquery.ba-throttle-debounce.min.js"></script>
+		<script type="application/javascript" src="jquery.flot.js"></script>
+		<script type="application/javascript" src="URI.js"></script>
+		<script type="application/javascript" src="rsvp.js"></script>
+		<script type="application/javascript" src="utils.js"></script>
+		<script type="application/javascript" src="panhorizon.js"></script>
+		<script type="application/javascript" src="stats.js"></script>
+	</body>
+</html>

@@ -1,0 +1,90 @@
+<!doctype html>
+<!--
+Copyright 2010 Google Inc. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<html>
+  <head>
+    <title>Pan(w)achrome Options</title>
+    <link rel="stylesheet" href="options.css" />
+  </head>
+  <body>
+    <h1>
+      <img src="images/icon_paper_128.png" width="32" height="32" />
+      Pan(w)achrome Options
+    </h1>
+    <div id="content">
+      <section>
+        <h3>Desktop Notifications</h3>
+        <div>
+          <div class="textboxControl">
+            <label>
+              <input id="notifTimeout" type="text" size="2"/>
+              <span>Timeout (s)</span>
+            </label>
+          </div>
+        </div>
+      </section>
+      <section>
+        <h3>Polling Interval</h3>
+        <div>
+          <div class="textboxControl">
+            <label>
+              <input id="trackingInterval" type="text" size="2"/>
+              <span>Stats Polling Interval (s) (> 5s)</span>
+            </label>
+          </div>
+        </div>
+      </section>
+      <section>
+        <h3>Polling Timeout</h3>
+        <div>
+          <div class="textboxControl">
+            <label>
+              <input id="requestTimeout" type="text" size="2"/>
+              <span>Stats Polling Requests Timeout (s)</span>
+            </label>
+          </div>
+        </div>
+      </section>
+      <section>
+        <h3>Jobs Polling Interval</h3>
+        <div>
+          <div class="textboxControl">
+            <label>
+              <input id="jobsTrackingInterval" type="text" size="2"/>
+              <span>Jobs Check Interval (s) (> 10s)</span>
+            </label>
+          </div>
+        </div>
+      </section>
+      <section>
+        <h3>Interfaces Rate Interval</h3>
+        <div>
+          <div class="textboxControl">
+            <label>
+              <input id="ifsTrackingInterval" type="text" size="2"/>
+              <span>Interfaces Rate Average Interval (s) (< Polling Interval-1s)</span>
+            </label>
+          </div>
+        </div>
+      </section>
+      <section>
+        <button id="reset-button">Reset</button>
+        <button id="save-button">Save & Close</button>
+      </section>
+    </div>
+    <script src="options.js"></script>
+  </body>
+</html>
