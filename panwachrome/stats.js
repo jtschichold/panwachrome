@@ -255,6 +255,7 @@
 		eventproxy.on("sessioninfoview:update", updateSessions);
 	};
 
+	// Resources
 	var resourcesMpcpuTableFields = [
 		['user', 'us'],
 		['hw irq', 'hi'],
@@ -623,6 +624,7 @@
 		eventproxy.on("cpview:update", updateResources);
 	};
 	
+	// Traffic
 	var ifsHwTableContents = function() {
 		var ihtml = [];
 		if(typeof mdevice.ifsView != "undefined") {
@@ -801,6 +803,7 @@
 		eventproxy.on("ifsview:update", updateIfs);
 	};
 	
+	// Counters
 	var showTCCounterGlobal = function() {
 		$containermenu.removeClass('containermenu-show');
 
@@ -832,24 +835,51 @@
 		});
 	};
 	var countersSeverities = ['info', 'warn', 'error', 'drop'];
+	var countersSorters = {
+		name: function(a,b) {
+			return a.name.localeCompare(b.name);
+		},
+		category: function(a,b) {
+			return a.category.localeCompare(b.category);
+		},
+		severity: function(a, b) {
+			var res;
+
+			var sa = countersSeverities.indexOf(a.severity);
+			var sb = countersSeverities.indexOf(b.severity);
+
+			res = sa-sb;
+			if(res === 0) {
+				res = a.category.localeCompare(b.category);
+			}
+
+			return res;
+		},
+		aspect: function(a,b) {
+			return a.aspect.localeCompare(b.aspect);
+		},
+		value: function(a,b) {
+			return a.value-b.value;
+		},
+		rate: function(a,b) {
+			return a.rate-b.rate;
+		}
+	};
 	var countersTableContents = function() {
 		var ihtml = [];
 		if(typeof mdevice.countersView != "undefined") {
+			var sattr = $('#stats-counters').attr('data-sort');
+			if (!sattr) sattr = 'severity';
+			var sdir = +$('#stats-counters').attr('data-sort-asc');
+			if (!sdir) sdir = "0";
 			var mycounters = mdevice.countersView.counters.slice(0); // copy the array
 
-			mycounters.sort(function(a, b) {
-				var res;
-
-				var sa = countersSeverities.indexOf(a.severity);
-				var sb = countersSeverities.indexOf(b.severity);
-
-				res = sb-sa;
-				if(res === 0) {
-					res = a.category.localeCompare(b.category);
-				}
-
-				return res;
-			});
+			var sf = countersSorters[sattr];
+			if (sdir == 0) {
+				mycounters.sort(function(a,b) { return -1*sf(a,b); });
+			} else {
+				mycounters.sort(sf);
+			}
 
 			for(var j = 0; j < mycounters.length; j++) {
 				var cc = mycounters[j];
@@ -873,7 +903,7 @@
 						rcclass = "value-changed-up";
 					}
 				}
-				ihtml.push('<tr><td>'+cc.name+'</td><td>'+cc.category+'</td><td>'+cc.severity+'</td><td>'+cc.aspect+'</td><td class="chartable" data-aname="value"><span class="'+vcclass+'">'+numformatter(cc.value)+'</span></td><td class="chartable" data-aname="rate"><span class="'+rcclass+'">'+numformatter(cc.rate)+'</span></td></tr>');
+				ihtml.push('<tr data-search="'+cc.name+cc.category+cc.severity+cc.aspect+'"><td>'+cc.name+'</td><td>'+cc.category+'</td><td>'+cc.severity+'</td><td>'+cc.aspect+'</td><td class="chartable" data-aname="value"><span class="'+vcclass+'">'+numformatter(cc.value)+'</span></td><td class="chartable" data-aname="rate"><span class="'+rcclass+'">'+numformatter(cc.rate)+'</span></td></tr>');
 			}
 
 			mycounters = null;
@@ -883,20 +913,80 @@
 		
 		return ihtml.join('');
 	};
+	var changeCounterTableSort = function() {
+		var $t = $(this);
+		var sattr = $t.attr('data-sattr');
+		var csattr = $('#stats-counters').attr('data-sort');
+		var csasc = +$('#stats-counters').attr('data-sort-asc');
+
+		if (sattr == csattr) {
+			if (csasc == 0) {
+				$('#stats-counters').attr('data-sort-asc', '1');
+				csasc = 1;
+			} else {
+				$('#stats-counters').attr('data-sort-asc', '0');
+				csasc = 0;
+			}
+		} else {
+			$('#stats-counters').attr('data-sort', sattr);
+			$('#stats-counters').attr('data-sort-asc', '0');
+			csasc = 0;
+		}
+
+		$('#stats-counters-headers th').each(function() {
+			if($(this).attr('data-sattr') == sattr) {
+				var $i = $(this).children('i').attr('class', 'fa');
+				if(csasc == 0) {
+					$i.addClass('fa-sort-desc');
+				} else {
+					$i.addClass('fa-sort-asc');
+				}
+			} else {
+				$(this).children('i').attr('class', 'fa').addClass('fa-unsorted');
+			}
+		});
+
+		updateCounterGlobal();
+	};
+	var filterCounterGlobal = function() {
+		var filter = $("#stats-counters-search-input").val().toLowerCase();
+		$("#stats-counters tbody tr").each(function() {
+			$t = $(this);
+			if($t.attr("data-search").indexOf(filter) == -1) {
+				$t.hide();
+			} else {
+				$t.show();
+			}
+		});
+	};
 	var updateCounterGlobal = function() {
 		$('#stats-counters tbody').html(countersTableContents());
+		filterCounterGlobal();
 	};
 	var displayCounterGlobal = function() {
 		$('#main').html('<div id="mainheader">Counter Global</div>');
 		$('#main').append('<div class="mainsection"><span class="sectiontitle">COUNTERS</span></div>');
 		var ihtml = [];
-		ihtml.push('<table id="stats-counters"><thead><tr><th>Name</th><th>Category</th><th>Severity</th><th>Aspect</th><th>Value</th><th>Rate</th></tr></thead>');
+		ihtml.push('<table id="stats-counters" data-sort="severity" data-sort-asc="0">');
+		ihtml.push('<thead>');
+		ihtml.push('<tr><td colspan="6" id="stats-counters-search"><i class="fa fa-search"></i><input id="stats-counters-search-input" type="text" size="31"></input></td></tr>');
+		ihtml.push('<tr id="stats-counters-headers">');
+			ihtml.push('<th id="stats-counters-hname" data-sattr="name">Name <i class="fa fa-unsorted"></i></th>');
+			ihtml.push('<th id="stats-counters-hcategory" data-sattr="category">Category <i class="fa fa-unsorted"></i></th>');
+			ihtml.push('<th id="stats-counters-hseverity" data-sattr="severity">Severity <i class="fa fa-sort-desc"></i></th>');
+			ihtml.push('<th id="stats-counters-haspect" data-sattr="aspect">Aspect <i class="fa fa-unsorted"></i></th>');
+			ihtml.push('<th id="stats-counters-hvalue" data-sattr="value">Value <i class="fa fa-unsorted"></i></th>');
+			ihtml.push('<th id="stats-counters-hrate" data-sattr="rate">Rate <i class="fa fa-unsorted"></i></th>');
+		ihtml.push('</tr>'); 
+		ihtml.push('</thead>');
 		ihtml.push('<tbody>');
 		ihtml.push(countersTableContents());
 		ihtml.push('</tbody');
 		ihtml.push('</table>');
 		$('#main').append(ihtml.join(''));
-		
+
+		$('#stats-counters-headers th').on('click', changeCounterTableSort);
+		$("#stats-counters-search-input").on("keyup", filterCounterGlobal)
 		$('#stats-counters').on('click', '.chartable', showTCCounterGlobal);
 		eventproxy.on("countersview:update", updateCounterGlobal);
 	};

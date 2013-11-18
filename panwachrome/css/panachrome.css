@@ -283,8 +283,28 @@ input.logininput {
 	font-style: italic;
 	font-weight: normal;
 }
+#stats-counters-headers th {
+	cursor: default;
+}
+#stats-counters-headers i.fa {
+	margin-left: 5px;
+}
+#stats-counters-headers i.fa-unsorted {
+	color: #bbb;
+}
 #stats-counters td {
 	border-bottom: 1px solid #eee;
+}
+#stats-counters-search {
+	border: 0 !important;
+	text-align: right;
+}
+#stats-counters-search-input {
+	border: 1px solid #000;
+	padding: 2px;
+	margin-left: 5px;
+	font-family: 'Yanone Kaffeesatz', Open Sans Condensed Light,Trebuchet MS, sans-serif;
+	font-size: 16px;
 }
 #stats-ifs-bpschart {
 	margin: 0;
