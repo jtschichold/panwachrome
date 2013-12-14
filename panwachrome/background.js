@@ -200,46 +200,106 @@ panachrome.dpMonitorFactory = function(mdevice) {
 		}
 		panwxmlapi.getDPResources(mdevice.key, mdevice.address, mdevice.port, mdevice.proto)
 			.then(function($result) {
-				var o2store = { dp0: {} };
+				var o2store = {};
 
-				$result.children().each(function() {
-					var $t = $(this);
-					var co = {};
+				$dps = $result.find('data-processors:first');
 
-					if(this.tagName == 'second') {
-						co.core = [];
-						$t.children('core').children('entry').each(function() {
-							co.core.push(P.childrenTextToArray($(this), "member"));
+				if($dps.length == 0) {
+					// pre-5.0.9 API, only DP0 is dumped
+					o2store.dp0 = {};
+
+					$result.children().each(function() {
+						var $t = $(this);
+						var co = {};
+
+						if(this.tagName == 'second') {
+							co.core = [];
+							$t.children('core').children('entry').each(function() {
+								co.core.push(P.childrenTextToArray($(this), "member"));
+							});
+
+							co.wqe = [];
+							$t.children('wqe').children('entry').each(function() {
+								co.wqe.push(P.childrenToObect($(this)));
+							});
+
+							co.res = [];
+							$t.children('res').children('entry').each(function() {
+								var tco = {};
+								tco.name = $(this).children('name').text();
+								tco.lastn = P.childrenTextToArray($(this).children('lastn:first'), 'member');
+								co.res.push(tco);
+							});
+						} else {
+							co.core = [];
+							$t.children('core').children('entry').each(function() {
+								co.core.push(P.childrenTextToArray($(this), "member"));
+							});
+
+							co.res = [];
+							$t.children('res').children('entry').each(function() {
+								var tco = {};
+								tco.name = $(this).children('name').text();
+								tco.lastn = P.childrenTextToArray($(this).children('lastn:first'), 'member');
+								co.res.push(tco);
+							});
+						}
+						o2store.dp0[this.tagName] = co;
+					});
+				} else {
+					$dps.children().each(function() {
+						var cdpo = {};
+
+						$(this).children().each(function() {
+							var $t = $(this);
+							var co = {};
+
+							var $cla = $t.children('cpu-load-average').children('entry');
+							var tcla = P.arrayOfArray($cla.length);
+							$cla.each(function() {
+								var coreid = +$(this).children('coreid').text();
+								var value = $(this).children('value').text().split(',');
+								tcla[coreid] = value;
+							});
+
+							var $clm = $t.children('cpu-load-maximum').children('entry');
+							var tclm = P.arrayOfArray($clm.length);
+							$clm.each(function() {
+								var coreid = +$(this).children('coreid').text();
+								var value = $(this).children('value').text().split(',');
+								tclm[coreid] = value;
+							});
+
+							if(tclm.length != tcla.length) {
+								conse.log("Different number of cores in resource monitor: "+tclm.length+" "+tcla.length);
+								return;
+							}
+
+							co.core = [];
+							for (var ct = 0; ct < tcla[0].length; ct++) {
+								var tstats = [];
+								for (var cc = 0; cc < tcla.length; cc++) {
+									tstats.push(tcla[cc][ct]);
+									if(this.tagName != 'second')
+										tstats.push(tclm[cc][ct]);
+								}
+								co.core.push(tstats);
+							}
+
+							co.res = [];
+							$t.children('resource-utilization').children('entry').each(function() {
+								var tco = {};
+								tco.name = $(this).children('name').text();
+								tco.lastn = $(this).children('value').text().split(',');
+								co.res.push(tco);
+							});
+
+							cdpo[this.tagName] = co;						
 						});
 
-						co.wqe = [];
-						$t.children('wqe').children('entry').each(function() {
-							co.wqe.push(P.childrenToObect($(this)));
-						});
-
-						co.res = [];
-						$t.children('res').children('entry').each(function() {
-							var tco = {};
-							tco.name = $(this).children('name').text();
-							tco.lastn = P.childrenTextToArray($(this).children('lastn:first'), 'member');
-							co.res.push(tco);
-						});
-					} else {
-						co.core = [];
-						$t.children('core').children('entry').each(function() {
-							co.core.push(P.childrenTextToArray($(this), "member"));
-						});
-
-						co.res = [];
-						$t.children('res').children('entry').each(function() {
-							var tco = {};
-							tco.name = $(this).children('name').text();
-							tco.lastn = P.childrenTextToArray($(this).children('lastn:first'), 'member');
-							co.res.push(tco);
-						});
-					}
-					o2store.dp0[this.tagName] = co;
-				});
+						o2store[this.tagName] = cdpo;
+					});
+				}
 				
 				mdevice.statsdb.add("dp", o2store)
 					.then(function(msg) {
