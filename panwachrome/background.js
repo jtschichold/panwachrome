@@ -2,18 +2,6 @@
 
 var panachrome = panachrome || {};
 
-// model sysdefs
-panachrome.sysdefs = {
-	'PA-200': {
-		'numDPs': 1,
-		'numDPcores': 2
-	},
-	'*': {
-		'numDPs': 1,
-		'numDPcores': 0
-	}
-};
-
 // config handlers
 panachrome.config = {};
 panachrome.readConfig = function() {
@@ -39,9 +27,31 @@ panachrome.readConfig = function() {
 	cval = parseInt(localStorage.getItem('maxRunningReq'), 10);
 	panachrome.config.maxRunningReq = (isNaN(cval) ? 2 : cval);
 	panwxmlapi.maxRunningReq = panachrome.config.maxRunningReq;
+
+	cval = JSON.parse(localStorage.getItem('filteredJobs'));
+	panachrome.config.filteredJobs = cval || [];
 };
 
 // messages to user
+panachrome.filterJobClicked = function(nid, buttonidx) {
+	if (nid.slice(0, 3) != "Job")
+		return;
+
+	var jobtype = nid.split("@")[2];
+	for (var i = 0; i < panachrome.config.filteredJobs.length; i++) {
+		if (panachrome.config.filteredJobs[i] == jobtype)
+			return;
+	}
+
+	panachrome.config.filteredJobs.push(jobtype);
+
+	localStorage.setItem('filteredJobs', JSON.stringify(panachrome.config.filteredJobs));
+};
+panachrome.notificationCloseOnTimeout = function(nid) {
+	setTimeout(function() { 
+		chrome.notifications.clear(nid, function() {}); 
+	}, panachrome.config.notifTimeout*1000);
+};
 panachrome.error = function(e) {
 	var n = webkitNotifications.createNotification("images/icon_paper_128.png", "Error", e);
 	n.show();
@@ -51,6 +61,24 @@ panachrome.info = function(e) {
 	var n = webkitNotifications.createNotification("images/icon_paper_128.png", "Info", e);
 	n.show();
 	setTimeout(function() { n.cancel(); }, panachrome.config.notifTimeout*1000);
+};
+panachrome.showJob = function(jobid, jobtype, jobresult) {
+	for (var i = 0; i < panachrome.config.filteredJobs.length; i++) {
+		if (panachrome.config.filteredJobs[i] == jobtype)
+			return;
+	}
+
+	chrome.notifications.create("Job@"+jobid+"@"+jobtype, {
+		title: 'Job '+jobid,
+		type: 'basic',
+		iconUrl: "images/icon_paper_128.png",
+		message: "Job "+jobid+" ("+jobtype+") finished: "+jobresult,
+		priority: 0,
+		buttons: [{
+			title: 'Don\'t show this job again'
+		}]
+	},
+	panachrome.notificationCloseOnTimeout);
 };
 
 // monitoring part
@@ -247,6 +275,8 @@ panachrome.dpMonitorFactory = function(mdevice) {
 						o2store.dp0[this.tagName] = co;
 					});
 				} else {
+					mdevice.sysdefs.numDPs = $dps.children().length; // update numDPs, should be dynamic for Condor
+
 					$dps.children().each(function() {
 						var cdpo = {};
 
@@ -684,7 +714,7 @@ panachrome.jobsMonitorFactory = function(mdevice) {
 					if(typeof mdevice.pendingJobs[id] != "undefined") {
 						var r = $t.children('result:first').text();
 						var t = $t.children('type:first').text();
-						panachrome.info('Job '+id+' ('+t+') finished: '+r);
+						panachrome.showJob(id, t, r);
 						delete mdevice.pendingJobs[id];
 
 						return;
@@ -693,7 +723,7 @@ panachrome.jobsMonitorFactory = function(mdevice) {
 					if(id > mdevice.lastJobId) {
 						var r = $t.children('result:first').text();
 						var t = $t.children('type:first').text();
-						panachrome.info('Job '+id+' ('+t+') finished: '+r);
+						panachrome.showJob(id, t, r);
 
 						return;						
 					}
@@ -832,12 +862,11 @@ panachrome.addMonitored = function(address, port, username, password, proto) {
 			candidate.hostname = hostname;
 			candidate.model = model;
 			candidate.swversion = swversion;
-			candidate.sysdefs = panachrome.sysdefs[model];
-			if(typeof candidate.sysdefs == "undefined") {
-				console.log('unknown PANW model: '+candidate.model);
-				candidate.sysdefs = panachrome.sysdefs['*']; // default sysdefs
-			}
-			
+
+			// default 1 DP, with pre-5.0.9 only DP0 was retrieved even on PA-5Ks. If post-5.0.9 numDPs is automatically updated 
+			// by DP resource monitor
+			candidate.sysdefs = { numDPs: 1 }; 
+
 			// console.log(candidate);
 
 			if (typeof panachrome.monitored[serial] != "undefined") {
@@ -886,7 +915,7 @@ panachrome.alreadyMonitoredByURL = function(url) {
 		if (!(cd instanceof panachrome.mDevice)) {
 			continue;
 		}
-		if(cd.address == address && cd.proto == proto && cd.protocol == proto) {
+		if(cd.address == address && cd.proto == proto && cd.port == port) {
 			return true;
 		}
 	}
@@ -919,6 +948,7 @@ panachrome.install = function(details) {
 	if(localStorage.getItem('ifsTrackingInterval') == null) localStorage.setItem('ifsTrackingInterval', '5');
 	if(localStorage.getItem('jobsTrackingInterval') == null) localStorage.setItem('jobsTrackingInterval', '30');
 	if(localStorage.getItem('pollingDefault') == null) localStorage.setItem('pollingDefault', '1');
+	if(localStorage.getItem('filteredJobs') == null) localStorage.setItem('filteredJobs', "[]");
 };
 panachrome.startup = function() {
 	panwstatsdb.deleteAll();
@@ -937,6 +967,9 @@ panachrome.setup = function() {
 			}
 			sendResponse({ result: res });
 			return;
+		}
+		if(request.cmd == "isalreadymonitored") {
+			sendResponse({ result: panachrome.alreadyMonitoredByURL(sender.tab.url) });
 		}
 		if(request.cmd == "readconfig") {
 			panachrome.readConfig();
@@ -960,6 +993,7 @@ panachrome.setup = function() {
 	chrome.runtime.onStartup.addListener(panachrome.startup);
 	chrome.runtime.onInstalled.addListener(panachrome.install);
 	chrome.extension.onRequest.addListener(onrequest);
+	chrome.notifications.onButtonClicked.addListener(panachrome.filterJobClicked);
 
 	// setup browseraction stuff
 	chrome.browserAction.setBadgeText({ text: "0" });

@@ -45,6 +45,31 @@ var panachrome_options = {
 		panachrome_options.saveTextbox(id);
 	}
   },
+
+  deleteListElement: function(e) {
+    var li = e.target.parentElement;
+    var ul = li.parentElement;
+    ul.removeChild(li);
+  },
+  loadList: function(id) {
+    var ul = document.getElementById(id);
+    var list = JSON.parse(localStorage.getItem(id));
+
+    var innerHTML = "";
+    for (var i = 0; i < list.length; i++) {
+      innerHTML = innerHTML+'<li><i class="fa-li fa fa-angle-right"></i>'+list[i]+'<i class="trash fa fa-trash-o"></i></li>';
+    }
+    ul.innerHTML = innerHTML;
+  },
+  saveList: function(id) {
+    var ul = document.getElementById(id);
+    var lis = ul.getElementsByTagName('li');
+    var list = [];
+    for (var i = 0; i < lis.length; i++) {
+      list.push(lis.item(i).textContent);
+    }
+    localStorage.setItem(id, JSON.stringify(list));
+  },
   
   validate: function() {
 	var t, ti;
@@ -86,6 +111,7 @@ var panachrome_options = {
     panachrome_options.saveIntTextbox('requestTimeout');
     panachrome_options.saveIntTextbox('jobsTrackingInterval');
     panachrome_options.saveIntTextbox('ifsTrackingInterval');
+    panachrome_options.saveList('filteredJobs');
   },
 
   load: function () {
@@ -94,6 +120,7 @@ var panachrome_options = {
     panachrome_options.loadTextbox('requestTimeout');
     panachrome_options.loadTextbox('ifsTrackingInterval');
     panachrome_options.loadTextbox('jobsTrackingInterval');
+    panachrome_options.loadList('filteredJobs');
   },
 
   reset: function () {
@@ -103,6 +130,11 @@ var panachrome_options = {
 
   init: function () {
     panachrome_options.load();
+
+    var trashes = document.getElementsByClassName('trash');
+    for (var i = 0; i < trashes.length; i++) {
+      trashes.item(i).addEventListener('click', panachrome_options.deleteListElement);
+    }
   }
 };
 

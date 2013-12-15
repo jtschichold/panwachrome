@@ -88,3 +88,8 @@ DIV.textboxControl > DIV:last-child > INPUT {
   box-sizing: border-box;
   width: 100%;
 }
+
+I.trash {
+  color: #aaa;
+  margin-left: 3px;
+}
