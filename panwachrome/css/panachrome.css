@@ -362,6 +362,14 @@ input.logininput {
 	width: 5%;
 	text-align: center;
 }
+#stats-sessions-states {
+	width: 100%;
+	border-collapse: collapse;	
+}
+#stats-sessions-states td {
+	width: 5%;
+	text-align: center;
+}
 #stats-sessions-deny {
 	width: 465px;
 	height: 200px;

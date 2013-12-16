@@ -123,3 +123,6 @@ panwxmlapi.getDPResources = function(key, address, port, proto) {
 panwxmlapi.getJobs = function(key, address, port, proto) {
 	return panwxmlapi.sendCmd("op", '<show><jobs><all></all></jobs></show>', key, address, port, proto);
 };
+panwxmlapi.getSessionStateCount = function(key, address, port, proto, state) {
+	return panwxmlapi.sendCmd("op", "<show><session><all><filter><state>"+state+"</state><count>yes</count></filter></all></session></show>", key, address, port, proto);
+};

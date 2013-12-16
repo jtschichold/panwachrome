@@ -163,6 +163,39 @@
 
 		return ihtml.join('');
 	};
+	var sessionStatesTableContents = function() {
+		var ihtml = [];
+
+		var ssv = mdevice.sessionStatesView;
+
+		ihtml.push("<tr>");
+		ihtml.push('<td><div class="stats-label">active</div><div class="stats-figure">'+(ssv ? ssv.active : "--")+'</div></td>');
+		ihtml.push('<td><div class="stats-label">closed</div><div class="stats-figure">'+(ssv ? ssv.closed : "--")+'</div></td>');
+		ihtml.push('<td><div class="stats-label">closing</div><div class="stats-figure">'+(ssv ? ssv.closing : "--")+'</div></td>');
+		ihtml.push('<td><div class="stats-label">discard</div><div class="stats-figure">'+(ssv ? ssv.discard : "--")+'</div></td>');
+		ihtml.push('<td><div class="stats-label">initial</div><div class="stats-figure">'+(ssv ? ssv.initial : "--")+'</div></td>');
+		ihtml.push('<td><div class="stats-label">opening</div><div class="stats-figure">'+(ssv ? ssv.opening : "--")+'</div></td>');
+		ihtml.push("</tr>");
+
+		return ihtml.join('');
+	};
+	var refreshSessionStates = function() {
+		var $ssr = $("#stats-sessions-refresh");
+		if ($ssr.hasClass("fa-spin")) 
+			return;
+		$ssr.addClass("fa-spin");
+		backgroundPage.panachrome.updateSessionStatesView(mdevice);
+	};
+	var updateSessionStates = function() {
+		if (mdevice.sessionStatesView) {
+			$("#stats-sessions-states-lastpoll").text(mdevice.sessionStatesView.lastPoll.toLocaleString())
+		}
+		var t = sessionStatesTableContents();
+		console.log(t);
+		$('#stats-sessions-states tbody').empty().html(t);
+		var $ssr = $("#stats-sessions-refresh");
+		$ssr.removeClass("fa-spin");
+	};
 	var updateSessions = function(event) {
 		if(event.type == "dpview:update") {
 			updateSessionsHistoryChart();
@@ -248,11 +281,21 @@
 
 		$('#main').append('<div style="display: block; clear: both;"></div>');
 
+		ihtml = [];
+		ihtml.push('<div class="mainsection"><span class="sectiontitle">SESSIONS STATES</span></div>');
+		ihtml.push('<div>(<i id="stats-sessions-refresh" class="fa fa-refresh"></i>) last poll <span id="stats-sessions-states-lastpoll">--</span></div>');
+		ihtml.push('<table id="stats-sessions-states"><tbody>');
+		ihtml.push('</tbody></table>');
+		$('#main').append(ihtml.join(''));
+		updateSessionStates();
+
+		$('#stats-sessions-refresh').on('click', refreshSessionStates);
 		$('#stats-sessions-current').on('click', '.chartable', showTCSessionsCurrent);
 
 		eventproxy.on("dpview:update", updateSessions);
 		eventproxy.on("countersview:update", updateSessions);
 		eventproxy.on("sessioninfoview:update", updateSessions);
+		eventproxy.on("sessionstatesview:update", updateSessionStates);
 	};
 
 	// Resources
@@ -1077,6 +1120,7 @@
 		eventproxy.off("cpview:update");
 		eventproxy.off("ifsview:update");
 		eventproxy.off("sessioninfoview:update");
+		eventproxy.off("sessionstatesview:update");
 	};
 	var initEventProxy = function() {
 		// setup the event proxy
@@ -1147,6 +1191,7 @@
 		mdevice.on("sessioninfoview:update", deviceUpdateHandler);
 		mdevice.on("dpview:update", deviceUpdateHandler);
 		mdevice.on("cpview:update", deviceUpdateHandler);
+		mdevice.on("sessionstatesview:update", deviceUpdateHandler);
 		$(w).bind('beforeunload', function() {
 			cancelAnimationFrame(cdownRAFID);
 
@@ -1155,6 +1200,7 @@
 			mdevice.off('sessioninfoview:update', deviceUpdateHandler);
 			mdevice.off('dpview:update', deviceUpdateHandler);
 			mdevice.off('cpview:update', deviceUpdateHandler);
+			mdevice.off("sessionstatesview:update", deviceUpdateHandler);
 			cleanEventProxy();
 			eventproxy = null;
 			RSVP.shutdown();
