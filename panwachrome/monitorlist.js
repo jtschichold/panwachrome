@@ -27,6 +27,10 @@
 		} else {
 			desc = "Not monitored";
 		}
+
+		var lastpoll = "N/A";
+		if(backgroundPage.panachrome.monitored[deviceinfo[1]].lastPoll) 
+			lastpoll = backgroundPage.panachrome.monitored[deviceinfo[1]].lastPoll.toLocaleString();
 		
 		ihtml = [];
 		ihtml.push('<tr data-dserial="'+deviceinfo[1]+'">');
@@ -34,6 +38,7 @@
 		ihtml.push('<td class="device-table-link">'+deviceinfo[1]+'</td>');
 		ihtml.push('<td class="device-table-link">'+deviceinfo[2]+'</td>');
 		ihtml.push('<td>'+desc+'</td>');
+		ihtml.push('<td>'+lastpoll+'</td>')
 		ihtml.push('<td class="device-table-tools"><a href="#" class="device-table-delete">remove</a></td>');
 
 		$table.append(ihtml.join(''));
@@ -45,7 +50,7 @@
 	var displayTabInfo  = function() {
 		var $table = $('#device-table');
 		$table.empty();
-		$table.html('<tr id="device-table-header"><th>Name</th><th>Serial</th><th>Address</th><th>Status</th><th>&nbsp;</th>');
+		$table.html('<tr id="device-table-header"><th>Name</th><th>Serial</th><th>Address</th><th>Status</th><th>Last Poll</th><th>&nbsp;</th>');
 		chrome.extension.sendRequest({cmd: 'getmonitored'}, function(response) {
 			if(response.hasOwnProperty('result')) {
 				if (response.result.length === 0) {

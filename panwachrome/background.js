@@ -92,6 +92,8 @@ panachrome.mDevice = function(address, port, proto) {
 panachrome.initDeviceSystemInfo = function(mdevice) {
 	panwxmlapi.getInterfaceAll(mdevice.key, mdevice.address, mdevice.port, mdevice.proto)
 		.then(function($result) {
+			mdevice.lastPoll = new Date();
+
 			var $ifnetentries = $result.children("ifnet").children("entry");
 			$ifnetentries.each(function() {
 				var hi = {};
@@ -135,6 +137,8 @@ panachrome.cpMonitorFactory = function(mdevice) {
 		}
 		panwxmlapi.getCPResources(mdevice.key, mdevice.address, mdevice.port, mdevice.proto)
 			.then(function($result) {
+				mdevice.lastPoll = new Date();
+
 				var o2store = { cpu: {}, memory: {}, swap: {} };
 				var topoutput = $result.text();
 				
@@ -228,6 +232,8 @@ panachrome.dpMonitorFactory = function(mdevice) {
 		}
 		panwxmlapi.getDPResources(mdevice.key, mdevice.address, mdevice.port, mdevice.proto)
 			.then(function($result) {
+				mdevice.lastPoll = new Date();
+
 				var o2store = {};
 
 				$dps = $result.find('data-processors:first');
@@ -366,6 +372,8 @@ panachrome.sessioninfoMonitorFactory = function(mdevice) {
 		}
 		panwxmlapi.getSessionInfo(mdevice.key, mdevice.address, mdevice.port, mdevice.proto)
 			.then(function($result) {
+				mdevice.lastPoll = new Date();
+
 				var o2store = P.childrenToObect($result, ["pps", "num-max", "num-active", "num-mcast",
 													"num-udp", "num-icmp", "num-predict", "num-bcast",
 													"num-installed", "num-tcp", "cps", "kbps"]);
@@ -405,6 +413,8 @@ panachrome.ifsMonitorFactory = function(mdevice) {
 		}
 		panwxmlapi.getIfsCounters(mdevice.key, mdevice.address, mdevice.port, mdevice.proto)
 			.then(function($result) {
+				mdevice.lastPoll = new Date();
+
 				var r1 = { ifnet: {}, hw: {} };
 				var r1date = new Date().getTime();
 				var o2store = { ifnet: [], hw: [] };
@@ -499,6 +509,8 @@ panachrome.ifsMonitorFactory = function(mdevice) {
 				setTimeout(function() {
 					panwxmlapi.getIfsCounters(mdevice.key, mdevice.address, mdevice.port, mdevice.proto)
 						.then(function($res2) {
+							mdevice.lastPoll = new Date();
+
 							var dt = ((new Date().getTime())-r1date);
 							
 							// ifnet
@@ -605,6 +617,8 @@ panachrome.countersMonitorFactory = function(mdevice) {
 		}
 		panwxmlapi.getCounterGlobal(mdevice.key, mdevice.address, mdevice.port, mdevice.proto)
 			.then(function($result) {
+				mdevice.lastPoll = new Date();
+
 				var o2store = { counters: [] };
 				var $entries = $result.find("global").find("counters").find("entry");
 				$entries.each(function() {
@@ -695,6 +709,8 @@ panachrome.jobsMonitorFactory = function(mdevice) {
 		}
 		panwxmlapi.getJobs(mdevice.key, mdevice.address, mdevice.port, mdevice.proto)
 			.then(function($result) {
+				mdevice.lastPoll = new Date();
+
 				mdevice.pendingJobs = mdevice.pendingJobs || {};
 				mdevice.lastJobId = mdevice.lastJobId || -1;
 				var lji = -1;
