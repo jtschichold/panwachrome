@@ -325,16 +325,16 @@
 
 		return ihtml.join('');
 	};
-	var resourcesMpmemoryTableContents = function() {
-		var ihtml = [];
-
+	var updateResourcesMpmemory = function() {
 		var memusage = (parseInt(mdevice.cpView.memory.used, 10)*100)/(parseInt(mdevice.cpView.memory.free, 10)+parseInt(mdevice.cpView.memory.used, 10));
 		var swapusage = (parseInt(mdevice.cpView.swap.used, 10)*100)/(parseInt(mdevice.cpView.swap.free, 10)+parseInt(mdevice.cpView.swap.used, 10));
 
-		ihtml.push('<td><div class="stats-label">Memory</div><div class="stats-figure chartable" data-aname="memory">'+percentformatter(memusage)+'</div></td>');
-		ihtml.push('<td><div class="stats-label">Swap</div><div class="stats-figure chartable" data-aname="swap">'+percentformatter(swapusage)+'</div></td>');
-
-		return ihtml.join('');
+		var $memory = $('#stats-resources-mpmemory .piechart[data-aname="memory"]');
+		var $swap = $('#stats-resources-mpmemory .piechart[data-aname="swap"]');
+		$memory.data('easyPieChart').update(Math.round(memusage));
+		$memory.find('.stats-figure').text(percentformatter(memusage));
+		$swap.data('easyPieChart').update(Math.round(swapusage));
+		$swap.find('.stats-figure').text(percentformatter(swapusage));
 	};
 	var resourcesDpcpuTableContents = function(numdp) {
 		var ihtml = [];
@@ -461,8 +461,7 @@
 		var t = resourcesMpcpuTableContents();
 		$('#stats-resources-mpcpu tbody').empty().html(t);
 
-		t = resourcesMpmemoryTableContents();
-		$('#stats-resources-mpmemory tbody').empty().html(t);
+		updateResourcesMpmemory();
 
 		updateResourcesMpCpuLoadAvg();
 		for(var j = 0; j < mdevice.sysdefs.numDPs; j++) {
@@ -622,8 +621,11 @@
 		ihtml.push('<div class="stats-col1-30">');
 		ihtml.push('<div class="mainsection"><span class="sectiontitle">MP MEMORY USAGE</span></div>');
 		ihtml.push('<table id="stats-resources-mpmemory"><tbody>');
-		ihtml.push(resourcesMpmemoryTableContents());
-		ihtml.push('</table></tbody>');
+		ihtml.push('<tr>');
+		ihtml.push('<td><div class="stats-label">Memory</div><div class="piechart chartable" data-percent="0" data-aname="memory"><div class="stats-figure">0%</div></div></td>');
+		ihtml.push('<td><div class="stats-label">Swap</div><div class="piechart chartable" data-percent="0" data-aname="swap"><div class="stats-figure">0%</div></div></td>');
+		ihtml.push('</tr>');
+		ihtml.push('</tbody></table>');
 		ihtml.push('</div>');
 		$('#main').append(ihtml.join(''));
 		$('#stats-resources-mpmemory').on('click', '.chartable', showTCResourcesMpMemory);
@@ -670,6 +672,13 @@
 			$('#main').append('<div style="display: block; clear: both;"></div>');
 		}
 		$('.stats-resources-dpcpu').on('click', '.chartable', showTCResourcesDpCore);
+
+		$('.piechart').easyPieChart({
+        	trackColor: "#ebeee6",
+        	barColor: "rgb(83,94,114)",
+        	scaleColor: "#ebeee6"
+    	});
+    	updateResourcesMpmemory();
 
 		eventproxy.on("dpview:update", updateResources);
 		eventproxy.on("cpview:update", updateResources);

@@ -605,3 +605,17 @@ input.logininput {
 .horizonflot {
 	border-top: 1px solid #ddd;
 }
+.piechart {
+	position: relative;
+}
+.piechart .stats-figure {
+	position: absolute;
+	left: 0;
+	right: 0;
+	margin-left: auto;
+	margin-right: auto;
+	line-height: 110px;
+}
+.piechart .stats-figure:hover {
+	text-decoration: underline;
+}
