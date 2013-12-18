@@ -365,130 +365,192 @@ panachrome.updateDpView = function(mdevice) {
 		});
 };
 
-panachrome.updateSessionStatesView = function(mdevice) {
+panachrome.updateSessionAdvancedView = function(mdevice) {
 	if(!mdevice.polling)
 		return;
 
-	mdevice.sessionStatesView = { numStates: 0 };
+	var maxNumStats = 9;
+
+	mdevice.sessionAdvancedView = { numStats: 0 };
 
 	panwxmlapi.getSessionStateCount(mdevice.key, mdevice.address, mdevice.port, mdevice.proto, "active")
 		.then(function($result) {
 			mdevice.lastPoll = new Date();
 
-			mdevice.sessionStatesView.numStates = mdevice.sessionStatesView.numStates+1;
-			mdevice.sessionStatesView.lastPoll = new Date();
-			mdevice.sessionStatesView.active = $result.find("member").text();
+			mdevice.sessionAdvancedView.numStats = mdevice.sessionAdvancedView.numStats+1;
+			mdevice.sessionAdvancedView.lastPoll = new Date();
+			mdevice.sessionAdvancedView.active = $result.find("member").text();
 
-			if(mdevice.sessionStatesView.numStates == 6) {
-				mdevice.triggerDetach("sessionstatesview:update");
+			if(mdevice.sessionAdvancedView.numStats == maxNumStats) {
+				mdevice.triggerDetach("sessionadvancedview:update");
 			}
 		})
 		.then(null, function(err) {
 			console.log("Error in retrieving session state active "+mdevice.serial+": "+err);
-			mdevice.sessionStatesView.numStates = mdevice.sessionStatesView.numStates+1;
-			mdevice.sessionStatesView.lastPoll = new Date();
-			if(mdevice.sessionStatesView.numStates == 6) {
-				mdevice.triggerDetach("sessionstatesview:update");
+			mdevice.sessionAdvancedView.numStats = mdevice.sessionAdvancedView.numStats+1;
+			mdevice.sessionAdvancedView.lastPoll = new Date();
+			if(mdevice.sessionAdvancedView.numStats == maxNumStats) {
+				mdevice.triggerDetach("sessionadvancedview:update");
 			}
 		});
 	panwxmlapi.getSessionStateCount(mdevice.key, mdevice.address, mdevice.port, mdevice.proto, "closed")
 		.then(function($result) {
 			mdevice.lastPoll = new Date();
 
-			mdevice.sessionStatesView.numStates = mdevice.sessionStatesView.numStates+1;
-			mdevice.sessionStatesView.lastPoll = new Date();
-			mdevice.sessionStatesView.closed = $result.find("member").text();
+			mdevice.sessionAdvancedView.numStats = mdevice.sessionAdvancedView.numStats+1;
+			mdevice.sessionAdvancedView.lastPoll = new Date();
+			mdevice.sessionAdvancedView.closed = $result.find("member").text();
 
-			if(mdevice.sessionStatesView.numStates == 6) {
-				mdevice.triggerDetach("sessionstatesview:update");
+			if(mdevice.sessionAdvancedView.numStats == maxNumStats) {
+				mdevice.triggerDetach("sessionadvancedview:update");
 			}
 		})
 		.then(null, function(err) {
 			console.log("Error in retrieving session state closed "+mdevice.serial+": "+err);
-			mdevice.sessionStatesView.numStates = mdevice.sessionStatesView.numStates+1;
-			mdevice.sessionStatesView.lastPoll = new Date();
-			if(mdevice.sessionStatesView.numStates == 6) {
-				mdevice.triggerDetach("sessionstatesview:update");
+			mdevice.sessionAdvancedView.numStats = mdevice.sessionAdvancedView.numStats+1;
+			mdevice.sessionAdvancedView.lastPoll = new Date();
+			if(mdevice.sessionAdvancedView.numStats == maxNumStats) {
+				mdevice.triggerDetach("sessionadvancedview:update");
 			}
 		});
 	panwxmlapi.getSessionStateCount(mdevice.key, mdevice.address, mdevice.port, mdevice.proto, "closing")
 		.then(function($result) {
 			mdevice.lastPoll = new Date();
 
-			mdevice.sessionStatesView.numStates = mdevice.sessionStatesView.numStates+1;
-			mdevice.sessionStatesView.lastPoll = new Date();
-			mdevice.sessionStatesView.closing = $result.find("member").text();
+			mdevice.sessionAdvancedView.numStats = mdevice.sessionAdvancedView.numStats+1;
+			mdevice.sessionAdvancedView.lastPoll = new Date();
+			mdevice.sessionAdvancedView.closing = $result.find("member").text();
 
-			if(mdevice.sessionStatesView.numStates == 6) {
-				mdevice.triggerDetach("sessionstatesview:update");
+			if(mdevice.sessionAdvancedView.numStats == maxNumStats) {
+				mdevice.triggerDetach("sessionadvancedview:update");
 			}
 		})
 		.then(null, function(err) {
 			console.log("Error in retrieving session state closing "+mdevice.serial+": "+err);
-			mdevice.sessionStatesView.numStates = mdevice.sessionStatesView.numStates+1;
-			mdevice.sessionStatesView.lastPoll = new Date();
-			if(mdevice.sessionStatesView.numStates == 6) {
-				mdevice.triggerDetach("sessionstatesview:update");
+			mdevice.sessionAdvancedView.numStats = mdevice.sessionAdvancedView.numStats+1;
+			mdevice.sessionAdvancedView.lastPoll = new Date();
+			if(mdevice.sessionAdvancedView.numStats == maxNumStats) {
+				mdevice.triggerDetach("sessionadvancedview:update");
 			}
 		});
 	panwxmlapi.getSessionStateCount(mdevice.key, mdevice.address, mdevice.port, mdevice.proto, "discard")
 		.then(function($result) {
 			mdevice.lastPoll = new Date();
 
-			mdevice.sessionStatesView.numStates = mdevice.sessionStatesView.numStates+1;
-			mdevice.sessionStatesView.lastPoll = new Date();
-			mdevice.sessionStatesView.discard = $result.find("member").text();
+			mdevice.sessionAdvancedView.numStats = mdevice.sessionAdvancedView.numStats+1;
+			mdevice.sessionAdvancedView.lastPoll = new Date();
+			mdevice.sessionAdvancedView.discard = $result.find("member").text();
 
-			if(mdevice.sessionStatesView.numStates == 6) {
-				mdevice.triggerDetach("sessionstatesview:update");
+			if(mdevice.sessionAdvancedView.numStats == maxNumStats) {
+				mdevice.triggerDetach("sessionadvancedview:update");
 			}
 		})
 		.then(null, function(err) {
 			console.log("Error in retrieving session state discard "+mdevice.serial+": "+err);
-			mdevice.sessionStatesView.numStates = mdevice.sessionStatesView.numStates+1;
-			mdevice.sessionStatesView.lastPoll = new Date();
-			if(mdevice.sessionStatesView.numStates == 6) {
-				mdevice.triggerDetach("sessionstatesview:update");
+			mdevice.sessionAdvancedView.numStats = mdevice.sessionAdvancedView.numStats+1;
+			mdevice.sessionAdvancedView.lastPoll = new Date();
+			if(mdevice.sessionAdvancedView.numStats == maxNumStats) {
+				mdevice.triggerDetach("sessionadvancedview:update");
 			}
 		});
 	panwxmlapi.getSessionStateCount(mdevice.key, mdevice.address, mdevice.port, mdevice.proto, "initial")
 		.then(function($result) {
 			mdevice.lastPoll = new Date();
 
-			mdevice.sessionStatesView.numStates = mdevice.sessionStatesView.numStates+1;
-			mdevice.sessionStatesView.lastPoll = new Date();
-			mdevice.sessionStatesView.initial = $result.find("member").text();
+			mdevice.sessionAdvancedView.numStats = mdevice.sessionAdvancedView.numStats+1;
+			mdevice.sessionAdvancedView.lastPoll = new Date();
+			mdevice.sessionAdvancedView.initial = $result.find("member").text();
 
-			if(mdevice.sessionStatesView.numStates == 6) {
-				mdevice.triggerDetach("sessionstatesview:update");
+			if(mdevice.sessionAdvancedView.numStats == maxNumStats) {
+				mdevice.triggerDetach("sessionadvancedview:update");
 			}
 		})
 		.then(null, function(err) {
 			console.log("Error in retrieving session state initial "+mdevice.serial+": "+err);
-			mdevice.sessionStatesView.numStates = mdevice.sessionStatesView.numStates+1;
-			mdevice.sessionStatesView.lastPoll = new Date();
-			if(mdevice.sessionStatesView.numStates == 6) {
-				mdevice.triggerDetach("sessionstatesview:update");
+			mdevice.sessionAdvancedView.numStats = mdevice.sessionAdvancedView.numStats+1;
+			mdevice.sessionAdvancedView.lastPoll = new Date();
+			if(mdevice.sessionAdvancedView.numStats == maxNumStats) {
+				mdevice.triggerDetach("sessionadvancedview:update");
 			}
 		});
 	panwxmlapi.getSessionStateCount(mdevice.key, mdevice.address, mdevice.port, mdevice.proto, "opening")
 		.then(function($result) {
 			mdevice.lastPoll = new Date();
 
-			mdevice.sessionStatesView.numStates = mdevice.sessionStatesView.numStates+1;
-			mdevice.sessionStatesView.lastPoll = new Date();
-			mdevice.sessionStatesView.opening = $result.find("member").text();
+			mdevice.sessionAdvancedView.numStats = mdevice.sessionAdvancedView.numStats+1;
+			mdevice.sessionAdvancedView.lastPoll = new Date();
+			mdevice.sessionAdvancedView.opening = $result.find("member").text();
 
-			if(mdevice.sessionStatesView.numStates == 6) {
-				mdevice.triggerDetach("sessionstatesview:update");
+			if(mdevice.sessionAdvancedView.numStats == maxNumStats) {
+				mdevice.triggerDetach("sessionadvancedview:update");
 			}
 		})
 		.then(null, function(err) {
 			console.log("Error in retrieving session state opening "+mdevice.serial+": "+err);
-			mdevice.sessionStatesView.numStates = mdevice.sessionStatesView.numStates+1;
-			mdevice.sessionStatesView.lastPoll = new Date();
-			if(mdevice.sessionStatesView.numStates == 6) {
-				mdevice.triggerDetach("sessionstatesview:update");
+			mdevice.sessionAdvancedView.numStats = mdevice.sessionAdvancedView.numStats+1;
+			mdevice.sessionAdvancedView.lastPoll = new Date();
+			if(mdevice.sessionAdvancedView.numStats == maxNumStats) {
+				mdevice.triggerDetach("sessionadvancedview:update");
+			}
+		});
+	panwxmlapi.getSessionDecryptCount(mdevice.key, mdevice.address, mdevice.port, mdevice.proto)
+		.then(function($result) {
+			mdevice.lastPoll = new Date();
+
+			mdevice.sessionAdvancedView.numStats = mdevice.sessionAdvancedView.numStats+1;
+			mdevice.sessionAdvancedView.lastPoll = new Date();
+			mdevice.sessionAdvancedView.decrypt = $result.find("member").text();
+
+			if(mdevice.sessionAdvancedView.numStats == maxNumStats) {
+				mdevice.triggerDetach("sessionadvancedview:update");
+			}
+		})
+		.then(null, function(err) {
+			console.log("Error in retrieving session decrypt "+mdevice.serial+": "+err);
+			mdevice.sessionAdvancedView.numStats = mdevice.sessionAdvancedView.numStats+1;
+			mdevice.sessionAdvancedView.lastPoll = new Date();
+			if(mdevice.sessionAdvancedView.numStats == maxNumStats) {
+				mdevice.triggerDetach("sessionadvancedview:update");
+			}
+		});
+	panwxmlapi.getSessionApplicationCount(mdevice.key, mdevice.address, mdevice.port, mdevice.proto, "unknown-tcp")
+		.then(function($result) {
+			mdevice.lastPoll = new Date();
+
+			mdevice.sessionAdvancedView.numStats = mdevice.sessionAdvancedView.numStats+1;
+			mdevice.sessionAdvancedView.lastPoll = new Date();
+			mdevice.sessionAdvancedView.unknowntcp = $result.find("member").text();
+
+			if(mdevice.sessionAdvancedView.numStats == maxNumStats) {
+				mdevice.triggerDetach("sessionadvancedview:update");
+			}
+		})
+		.then(null, function(err) {
+			console.log("Error in retrieving session unknown-tcp "+mdevice.serial+": "+err);
+			mdevice.sessionAdvancedView.numStats = mdevice.sessionAdvancedView.numStats+1;
+			mdevice.sessionAdvancedView.lastPoll = new Date();
+			if(mdevice.sessionAdvancedView.numStats == maxNumStats) {
+				mdevice.triggerDetach("sessionadvancedview:update");
+			}
+		});
+	panwxmlapi.getSessionApplicationCount(mdevice.key, mdevice.address, mdevice.port, mdevice.proto, "unknown-udp")
+		.then(function($result) {
+			mdevice.lastPoll = new Date();
+
+			mdevice.sessionAdvancedView.numStats = mdevice.sessionAdvancedView.numStats+1;
+			mdevice.sessionAdvancedView.lastPoll = new Date();
+			mdevice.sessionAdvancedView.unknownudp = $result.find("member").text();
+
+			if(mdevice.sessionAdvancedView.numStats == maxNumStats) {
+				mdevice.triggerDetach("sessionadvancedview:update");
+			}
+		})
+		.then(null, function(err) {
+			console.log("Error in retrieving session unknown-udp "+mdevice.serial+": "+err);
+			mdevice.sessionAdvancedView.numStats = mdevice.sessionAdvancedView.numStats+1;
+			mdevice.sessionAdvancedView.lastPoll = new Date();
+			if(mdevice.sessionAdvancedView.numStats == maxNumStats) {
+				mdevice.triggerDetach("sessionadvancedview:update");
 			}
 		});
 };

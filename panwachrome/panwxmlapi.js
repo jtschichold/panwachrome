@@ -126,3 +126,9 @@ panwxmlapi.getJobs = function(key, address, port, proto) {
 panwxmlapi.getSessionStateCount = function(key, address, port, proto, state) {
 	return panwxmlapi.sendCmd("op", "<show><session><all><filter><state>"+state+"</state><count>yes</count></filter></all></session></show>", key, address, port, proto);
 };
+panwxmlapi.getSessionApplicationCount = function(key, address, port, proto, application) {
+	return panwxmlapi.sendCmd("op", "<show><session><all><filter><application>"+application+"</application><count>yes</count></filter></all></session></show>", key, address, port, proto);
+};
+panwxmlapi.getSessionDecryptCount = function(key, address, port, proto) {
+	return panwxmlapi.sendCmd("op", "<show><session><all><filter><ssl-decrypt>yes</ssl-decrypt><count>yes</count></filter></all></session></show>", key, address, port, proto);
+};
