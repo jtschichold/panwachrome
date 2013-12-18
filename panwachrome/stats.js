@@ -676,7 +676,8 @@
 		$('.piechart').easyPieChart({
         	trackColor: "#ebeee6",
         	barColor: "rgb(83,94,114)",
-        	scaleColor: "#ebeee6"
+        	scaleColor: "#ebeee6",
+        	animate: false
     	});
     	updateResourcesMpmemory();
 

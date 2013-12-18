@@ -68,11 +68,11 @@ var CanvasRenderer = function(el, options) {
 	 * @param  {number} lineWidth Width of the line in px
 	 * @param  {number} percent   Percentage to draw (float between 0 and 1)
 	 */
-	var drawCircle = function(color, lineWidth, percent) {
+	var drawCircle = function(cradius, color, lineWidth, percent) {
 		percent = Math.min(Math.max(0, percent || 1), 1);
 
 		ctx.beginPath();
-		ctx.arc(0, 0, radius, 0, Math.PI * 2 * percent, false);
+		ctx.arc(0, 0, cradius, 0, Math.PI * 2 * percent, false);
 
 		ctx.strokeStyle = color;
 		ctx.lineWidth = lineWidth;
@@ -122,9 +122,13 @@ var CanvasRenderer = function(el, options) {
 	/**
 	 * Draw the background of the plugin including the scale and the track
 	 */
-	var drawBackground = function() {
+	var drawBackground = function(numcircles) {
 		options.scaleColor && drawScale();
-		options.trackColor && drawCircle(options.trackColor, options.lineWidth);
+		if (options.trackColor) {
+			for(var i = 0; i < numcircles; i++) {
+				drawCircle(radius-i*(options.lineWidth+options.gap), options.trackColor, options.lineWidth);
+			}
+		}
 	};
 
 	/**
@@ -138,20 +142,27 @@ var CanvasRenderer = function(el, options) {
 	 * Draw the complete chart
 	 * @param  {number} percent Percent shown by the chart between 0 and 100
 	 */
-	this.draw = function(percent) {
+	this.draw = function(percents, clearBackground) {
+		clearBackground = clearBackground || false;
+
+		if(clearBackground) {
+			this.clear();
+			cachedBackground = null;
+		}
+
 		// do we need to render a background
 		if (!!options.scaleColor || !!options.trackColor) {
 			// getImageData and putImageData are supported
 			if (ctx.getImageData && ctx.putImageData) {
 				if (!cachedBackground) {
-					drawBackground();
+					drawBackground(percents.length);
 					cachedBackground = ctx.getImageData(0, 0, options.size * scaleBy, options.size * scaleBy);
 				} else {
 					ctx.putImageData(cachedBackground, 0, 0);
 				}
 			} else {
 				this.clear();
-				drawBackground();
+				drawBackground(percents.length);
 			}
 		} else {
 			this.clear();
@@ -161,15 +172,19 @@ var CanvasRenderer = function(el, options) {
 
 		// if barcolor is a function execute it and pass the percent as a value
 		var color;
-		if (typeof(options.barColor) === 'function') {
-			color = options.barColor(percent);
-		} else {
-			color = options.barColor;
-		}
+		var percent;
+		for(var i = 0; i < percents.length; i++) {
+			percent = percents[i];
+			if (typeof(options.barColor) === 'function') {
+				color = options.barColor(percent);
+			} else {
+				color = options.barColor;
+			}
 
-		// draw bar
-		if (percent > 0) {
-			drawCircle(color, options.lineWidth, percent / 100);
+			// draw bar
+			if (percent > 0) {
+				drawCircle(radius-i*(options.gap+options.lineWidth), color, options.lineWidth, percent / 100);
+			}
 		}
 	}.bind(this);
 
@@ -208,6 +223,7 @@ var EasyPieChart = function(el, opts) {
 		size: 110,
 		rotate: 0,
 		animate: 1000,
+		gap: 2,
 		easing: function (x, t, b, c, d) { // more can be found here: http://gsgd.co.uk/sandbox/jquery/easing/
 			t = t / (d/2);
 			if (t < 1) {
@@ -236,7 +252,7 @@ var EasyPieChart = function(el, opts) {
 	}
 
 	var options = {};
-	var currentValue = 0;
+	var currentValue = [0];
 
 	/**
 	 * Initialize the plugin by creating the options object and initialize rendering
@@ -270,9 +286,9 @@ var EasyPieChart = function(el, opts) {
 
 		// initial update
 		if (el.dataset && el.dataset.percent) {
-			this.update(parseFloat(el.dataset.percent));
+			this.update(el.dataset.percent);
 		} else if (el.getAttribute && el.getAttribute('data-percent')) {
-			this.update(parseFloat(el.getAttribute('data-percent')));
+			this.update(el.getAttribute('data-percent'));
 		}
 	}.bind(this);
 
@@ -282,11 +298,16 @@ var EasyPieChart = function(el, opts) {
 	 * @return {object}          Instance of the plugin for method chaining
 	 */
 	this.update = function(newValue) {
-		newValue = parseFloat(newValue);
+		if (typeof newValue == 'number') {
+			newValue = [newValue];
+		}
+		else if (newValue instanceof String) { 
+			newValue = newValue.split(",").map(parseFloat);
+		}
 		if (options.animate) {
 			this.renderer.animate(currentValue, newValue);
 		} else {
-			this.renderer.draw(newValue);
+			this.renderer.draw(newValue, (currentValue.length != newValue.length));
 		}
 		currentValue = newValue;
 		return this;
