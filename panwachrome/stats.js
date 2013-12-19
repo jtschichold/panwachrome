@@ -316,11 +316,20 @@
 		['system', 'sy'],
 		['io wait', 'wa']
 	];
+	var updateResourcesMpcpuTable = function() {
+		var $mpcharts = $("#stats-resources-mpcpu .piechart");
+
+		for(var j = 0; j < resourcesMpcpuTableFields.length; j++) {
+			var $cc = $mpcharts.filter('*[data-aname="'+resourcesMpcpuTableFields[j][1]+'"]');
+			$cc.data('easyPieChart').update(+mdevice.cpView.cpu[resourcesMpcpuTableFields[j][1]]);
+			$cc.children('.stats-figure').text(percentformatter(+mdevice.cpView.cpu[resourcesMpcpuTableFields[j][1]]));
+		}
+	};
 	var resourcesMpcpuTableContents = function() {
 		var ihtml = [];
 
 		for(var j = 0; j < resourcesMpcpuTableFields.length; j++) {
-			ihtml.push('<td><div class="stats-label">'+resourcesMpcpuTableFields[j][0]+'</div><div class="stats-figure chartable" data-aname="'+resourcesMpcpuTableFields[j][1]+'">'+mdevice.cpView.cpu[resourcesMpcpuTableFields[j][1]]+'%</div></td>');
+			ihtml.push('<td><div class="stats-label">'+resourcesMpcpuTableFields[j][0]+'</div><div class="piechart chartable" data-percent="0" data-aname="'+resourcesMpcpuTableFields[j][1]+'"><div class="stats-figure">0%</div></div></td>');
 		}
 
 		return ihtml.join('');
@@ -473,8 +482,7 @@
 		});
 	};
 	var updateResources = function() {
-		var t = resourcesMpcpuTableContents();
-		$('#stats-resources-mpcpu tbody').empty().html(t);
+		updateResourcesMpcpuTable();
 
 		updateResourcesMpmemory();
 
@@ -625,9 +633,9 @@
 
 		ihtml = [];
 		ihtml.push('<div class="mainsection"><span class="sectiontitle">MP CPU USAGE</span></div>');
-		ihtml.push('<table id="stats-resources-mpcpu"><tbody>');
+		ihtml.push('<table id="stats-resources-mpcpu"><tbody><tr>');
 		ihtml.push(resourcesMpcpuTableContents());
-		ihtml.push('</table></tbody>');
+		ihtml.push('</tr></tbody></table>');
 		$('#main').append(ihtml.join(''));
 		$('#stats-resources-mpcpu').on('click', '.chartable', showTCResourcesMpCpu);
 
@@ -694,6 +702,7 @@
         	animate: false
     	});
     	updateResourcesMpmemory();
+    	updateResourcesMpcpuTable();
 
 		$('.dppiechart').easyPieChart({
         	trackColor: "#ebeee6",
