@@ -184,6 +184,8 @@ var CanvasRenderer = function(el, options) {
 			// draw bar
 			if (percent > 0) {
 				drawCircle(radius-i*(options.gap+options.lineWidth), color, options.lineWidth, percent / 100);
+			} else if (isNaN(percent)) {
+				drawCircle(radius-i*(options.gap+options.lineWidth), options.disabledTrackColor, options.lineWidth, percent / 100);				
 			}
 		}
 	}.bind(this);
@@ -216,6 +218,7 @@ var EasyPieChart = function(el, opts) {
 	var defaultOptions = {
 		barColor: '#ef1e25',
 		trackColor: '#f9f9f9',
+		disabledTrackColor: '#fbfbfb',
 		scaleColor: '#dfe0e0',
 		scaleLength: 5,
 		lineCap: 'round',

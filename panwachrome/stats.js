@@ -336,16 +336,31 @@
 		$swap.data('easyPieChart').update(Math.round(swapusage));
 		$swap.find('.stats-figure').text(percentformatter(swapusage));
 	};
+	var updateResourcesDpcpuTable = function(numdp) {
+		var $dpcharts = $('#stats-resources-dpcpu'+numdp+' .dppiechart');
+		var numcores = mdevice.dpView['dp'+numdp].second.core[0].length;
+		var dpvalues = P.arrayOfArray($dpcharts.length);
+		var cpc = 32/$dpcharts.length;
+
+		for(var j = 0; j < 32; j++) {
+			if(j < numcores) {
+				dpvalues[Math.floor(j/cpc)].push(mdevice.dpView['dp'+numdp].second.core[0][j]);
+			} else {
+				dpvalues[Math.floor(j/cpc)].push(Number.NaN);
+			}
+		}
+		for(var j = 0; j < $dpcharts.length; j++) {
+			$dpcharts.eq(j).data('easyPieChart').update(dpvalues[j]);
+		}
+	};
 	var resourcesDpcpuTableContents = function(numdp) {
 		var ihtml = [];
 		var numcores = mdevice.dpView['dp'+numdp].second.core[0].length;
 
-		for(var j = 0; j < numcores; j++) {
-			ihtml.push('<td><div class="stats-label">core'+j+'</div><div class="stats-figure chartable" data-aname="dp'+numdp+'.core'+j+'">'+mdevice.dpView['dp'+numdp].second.core[0][j]+'%</div></td>');
-		}
-		for(; j < 16 /* max num of cores in a PANW DP */; j++) {
-			ihtml.push('<td><div class="stats-label stats-disabled">core'+j+'</div><div class="stats-figure stats-disabled">--</div></td>');
-		}
+		ihtml.push('<td><div class="stats-label">core 0-7</div><div class="dppiechart chartable" data-percent="0,0,0,0,0,0,0,0" data-aname="dp'+numdp+'.core0"></div></td>');
+		ihtml.push('<td><div class="stats-label'+(numcores > 8 ? '': ' stats-disabled')+'">core 8-15</div><div class="dppiechart chartable" data-percent="0,0,0,0,0,0,0,0" data-aname="dp'+numdp+'.core8"></div></td>');
+		ihtml.push('<td><div class="stats-label'+(numcores > 16 ? '': ' stats-disabled')+'">core 16-23</div><div class="dppiechart chartable" data-percent="0,0,0,0,0,0,0,0" data-aname="dp'+numdp+'.core16"></div></td>');
+		ihtml.push('<td><div class="stats-label'+(numcores > 24 ? '': ' stats-disabled')+'">core 24-31</div><div class="dppiechart chartable" data-percent="0,0,0,0,0,0,0,0" data-aname="dp'+numdp+'.core31"></div></td>');
 
 		return ihtml.join('');
 	};
@@ -465,8 +480,7 @@
 
 		updateResourcesMpCpuLoadAvg();
 		for(var j = 0; j < mdevice.sysdefs.numDPs; j++) {
-			t = resourcesDpcpuTableContents(j);
-			$('#stats-resources-dpcpu'+j+' tbody').empty().html(t);
+			updateResourcesDpcpuTable(j);
 			updateResourcesDpLoadHistoryChart(j);
 			updateResourcesDpResHistoryChart(j);
 		}
@@ -643,9 +657,9 @@
 		for(var j = 0; j < mdevice.sysdefs.numDPs; j++) {
 			ihtml = [];
 			ihtml.push('<div class="mainsection"><span class="sectiontitle">DP'+j+' CORES LOAD</span></div>');
-			ihtml.push('<table id="stats-resources-dpcpu'+j+'" class="stats-resources-dpcpu"><tbody>');
+			ihtml.push('<table id="stats-resources-dpcpu'+j+'" class="stats-resources-dpcpu"><tbody><tr>');
 			ihtml.push(resourcesDpcpuTableContents(j));
-			ihtml.push('</table></tbody>');
+			ihtml.push('</tr></tbody></table>');
 			$('#main').append(ihtml.join(''));
 
 			ihtml = [];
@@ -680,6 +694,18 @@
         	animate: false
     	});
     	updateResourcesMpmemory();
+
+		$('.dppiechart').easyPieChart({
+        	trackColor: "#ebeee6",
+        	barColor: "rgb(83,94,114)",
+        	scaleColor: "#ebeee6",
+        	disabledTrackColor: "#f8f8f8",
+        	animate: false,
+        	size: 200
+    	});
+    	for(var j = 0; j < mdevice.sysdefs.numDPs; j++) {
+    		updateResourcesDpcpuTable(j);
+    	}
 
 		eventproxy.on("dpview:update", updateResources);
 		eventproxy.on("cpview:update", updateResources);
