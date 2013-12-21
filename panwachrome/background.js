@@ -369,9 +369,7 @@ panachrome.updateSessionAdvancedView = function(mdevice) {
 	if(!mdevice.polling)
 		return;
 
-	var maxNumStats = 9;
-
-	mdevice.sessionAdvancedView = { numStats: 0 };
+	mdevice.sessionAdvancedView = { maxNumStats: 9, numStats: 0 };
 
 	panwxmlapi.getSessionStateCount(mdevice.key, mdevice.address, mdevice.port, mdevice.proto, "active")
 		.then(function($result) {
@@ -381,7 +379,7 @@ panachrome.updateSessionAdvancedView = function(mdevice) {
 			mdevice.sessionAdvancedView.lastPoll = new Date();
 			mdevice.sessionAdvancedView.active = $.map($result.find('member'), function(x, i) { return +x.textContent; });
 
-			if(mdevice.sessionAdvancedView.numStats == maxNumStats) {
+			if(mdevice.sessionAdvancedView.numStats == mdevice.sessionAdvancedView.maxNumStats) {
 				mdevice.triggerDetach("sessionadvancedview:update");
 			}
 		})
@@ -389,7 +387,7 @@ panachrome.updateSessionAdvancedView = function(mdevice) {
 			console.log("Error in retrieving session state active "+mdevice.serial+": "+err);
 			mdevice.sessionAdvancedView.numStats = mdevice.sessionAdvancedView.numStats+1;
 			mdevice.sessionAdvancedView.lastPoll = new Date();
-			if(mdevice.sessionAdvancedView.numStats == maxNumStats) {
+			if(mdevice.sessionAdvancedView.numStats == mdevice.sessionAdvancedView.maxNumStats) {
 				mdevice.triggerDetach("sessionadvancedview:update");
 			}
 		});
@@ -401,7 +399,7 @@ panachrome.updateSessionAdvancedView = function(mdevice) {
 			mdevice.sessionAdvancedView.lastPoll = new Date();
 			mdevice.sessionAdvancedView.closed = $.map($result.find('member'), function(x, i) { return +x.textContent; });
 
-			if(mdevice.sessionAdvancedView.numStats == maxNumStats) {
+			if(mdevice.sessionAdvancedView.numStats == mdevice.sessionAdvancedView.maxNumStats) {
 				mdevice.triggerDetach("sessionadvancedview:update");
 			}
 		})
@@ -409,7 +407,7 @@ panachrome.updateSessionAdvancedView = function(mdevice) {
 			console.log("Error in retrieving session state closed "+mdevice.serial+": "+err);
 			mdevice.sessionAdvancedView.numStats = mdevice.sessionAdvancedView.numStats+1;
 			mdevice.sessionAdvancedView.lastPoll = new Date();
-			if(mdevice.sessionAdvancedView.numStats == maxNumStats) {
+			if(mdevice.sessionAdvancedView.numStats == mdevice.sessionAdvancedView.maxNumStats) {
 				mdevice.triggerDetach("sessionadvancedview:update");
 			}
 		});
@@ -421,7 +419,7 @@ panachrome.updateSessionAdvancedView = function(mdevice) {
 			mdevice.sessionAdvancedView.lastPoll = new Date();
 			mdevice.sessionAdvancedView.closing = $.map($result.find('member'), function(x, i) { return +x.textContent; });
 
-			if(mdevice.sessionAdvancedView.numStats == maxNumStats) {
+			if(mdevice.sessionAdvancedView.numStats == mdevice.sessionAdvancedView.maxNumStats) {
 				mdevice.triggerDetach("sessionadvancedview:update");
 			}
 		})
@@ -429,7 +427,7 @@ panachrome.updateSessionAdvancedView = function(mdevice) {
 			console.log("Error in retrieving session state closing "+mdevice.serial+": "+err);
 			mdevice.sessionAdvancedView.numStats = mdevice.sessionAdvancedView.numStats+1;
 			mdevice.sessionAdvancedView.lastPoll = new Date();
-			if(mdevice.sessionAdvancedView.numStats == maxNumStats) {
+			if(mdevice.sessionAdvancedView.numStats == mdevice.sessionAdvancedView.maxNumStats) {
 				mdevice.triggerDetach("sessionadvancedview:update");
 			}
 		});
@@ -441,7 +439,7 @@ panachrome.updateSessionAdvancedView = function(mdevice) {
 			mdevice.sessionAdvancedView.lastPoll = new Date();
 			mdevice.sessionAdvancedView.discard = $.map($result.find('member'), function(x, i) { return +x.textContent; });
 
-			if(mdevice.sessionAdvancedView.numStats == maxNumStats) {
+			if(mdevice.sessionAdvancedView.numStats == mdevice.sessionAdvancedView.maxNumStats) {
 				mdevice.triggerDetach("sessionadvancedview:update");
 			}
 		})
@@ -449,7 +447,7 @@ panachrome.updateSessionAdvancedView = function(mdevice) {
 			console.log("Error in retrieving session state discard "+mdevice.serial+": "+err);
 			mdevice.sessionAdvancedView.numStats = mdevice.sessionAdvancedView.numStats+1;
 			mdevice.sessionAdvancedView.lastPoll = new Date();
-			if(mdevice.sessionAdvancedView.numStats == maxNumStats) {
+			if(mdevice.sessionAdvancedView.numStats == mdevice.sessionAdvancedView.maxNumStats) {
 				mdevice.triggerDetach("sessionadvancedview:update");
 			}
 		});
@@ -461,7 +459,7 @@ panachrome.updateSessionAdvancedView = function(mdevice) {
 			mdevice.sessionAdvancedView.lastPoll = new Date();
 			mdevice.sessionAdvancedView.initial = $.map($result.find('member'), function(x, i) { return +x.textContent; });
 
-			if(mdevice.sessionAdvancedView.numStats == maxNumStats) {
+			if(mdevice.sessionAdvancedView.numStats == mdevice.sessionAdvancedView.maxNumStats) {
 				mdevice.triggerDetach("sessionadvancedview:update");
 			}
 		})
@@ -469,7 +467,7 @@ panachrome.updateSessionAdvancedView = function(mdevice) {
 			console.log("Error in retrieving session state initial "+mdevice.serial+": "+err);
 			mdevice.sessionAdvancedView.numStats = mdevice.sessionAdvancedView.numStats+1;
 			mdevice.sessionAdvancedView.lastPoll = new Date();
-			if(mdevice.sessionAdvancedView.numStats == maxNumStats) {
+			if(mdevice.sessionAdvancedView.numStats == mdevice.sessionAdvancedView.maxNumStats) {
 				mdevice.triggerDetach("sessionadvancedview:update");
 			}
 		});
@@ -481,7 +479,7 @@ panachrome.updateSessionAdvancedView = function(mdevice) {
 			mdevice.sessionAdvancedView.lastPoll = new Date();
 			mdevice.sessionAdvancedView.opening = $.map($result.find('member'), function(x, i) { return +x.textContent; });
 
-			if(mdevice.sessionAdvancedView.numStats == maxNumStats) {
+			if(mdevice.sessionAdvancedView.numStats == mdevice.sessionAdvancedView.maxNumStats) {
 				mdevice.triggerDetach("sessionadvancedview:update");
 			}
 		})
@@ -489,7 +487,7 @@ panachrome.updateSessionAdvancedView = function(mdevice) {
 			console.log("Error in retrieving session state opening "+mdevice.serial+": "+err);
 			mdevice.sessionAdvancedView.numStats = mdevice.sessionAdvancedView.numStats+1;
 			mdevice.sessionAdvancedView.lastPoll = new Date();
-			if(mdevice.sessionAdvancedView.numStats == maxNumStats) {
+			if(mdevice.sessionAdvancedView.numStats == mdevice.sessionAdvancedView.maxNumStats) {
 				mdevice.triggerDetach("sessionadvancedview:update");
 			}
 		});
@@ -501,7 +499,7 @@ panachrome.updateSessionAdvancedView = function(mdevice) {
 			mdevice.sessionAdvancedView.lastPoll = new Date();
 			mdevice.sessionAdvancedView.decrypt = $.map($result.find('member'), function(x, i) { return +x.textContent; });
 
-			if(mdevice.sessionAdvancedView.numStats == maxNumStats) {
+			if(mdevice.sessionAdvancedView.numStats == mdevice.sessionAdvancedView.maxNumStats) {
 				mdevice.triggerDetach("sessionadvancedview:update");
 			}
 		})
@@ -509,7 +507,7 @@ panachrome.updateSessionAdvancedView = function(mdevice) {
 			console.log("Error in retrieving session decrypt "+mdevice.serial+": "+err);
 			mdevice.sessionAdvancedView.numStats = mdevice.sessionAdvancedView.numStats+1;
 			mdevice.sessionAdvancedView.lastPoll = new Date();
-			if(mdevice.sessionAdvancedView.numStats == maxNumStats) {
+			if(mdevice.sessionAdvancedView.numStats == mdevice.sessionAdvancedView.maxNumStats) {
 				mdevice.triggerDetach("sessionadvancedview:update");
 			}
 		});
@@ -521,7 +519,7 @@ panachrome.updateSessionAdvancedView = function(mdevice) {
 			mdevice.sessionAdvancedView.lastPoll = new Date();
 			mdevice.sessionAdvancedView.unknowntcp = $.map($result.find('member'), function(x, i) { return +x.textContent; });
 
-			if(mdevice.sessionAdvancedView.numStats == maxNumStats) {
+			if(mdevice.sessionAdvancedView.numStats == mdevice.sessionAdvancedView.maxNumStats) {
 				mdevice.triggerDetach("sessionadvancedview:update");
 			}
 		})
@@ -529,7 +527,7 @@ panachrome.updateSessionAdvancedView = function(mdevice) {
 			console.log("Error in retrieving session unknown-tcp "+mdevice.serial+": "+err);
 			mdevice.sessionAdvancedView.numStats = mdevice.sessionAdvancedView.numStats+1;
 			mdevice.sessionAdvancedView.lastPoll = new Date();
-			if(mdevice.sessionAdvancedView.numStats == maxNumStats) {
+			if(mdevice.sessionAdvancedView.numStats == mdevice.sessionAdvancedView.maxNumStats) {
 				mdevice.triggerDetach("sessionadvancedview:update");
 			}
 		});
@@ -541,7 +539,7 @@ panachrome.updateSessionAdvancedView = function(mdevice) {
 			mdevice.sessionAdvancedView.lastPoll = new Date();
 			mdevice.sessionAdvancedView.unknownudp = $.map($result.find('member'), function(x, i) { return +x.textContent; });
 
-			if(mdevice.sessionAdvancedView.numStats == maxNumStats) {
+			if(mdevice.sessionAdvancedView.numStats == mdevice.sessionAdvancedView.maxNumStats) {
 				mdevice.triggerDetach("sessionadvancedview:update");
 			}
 		})
@@ -549,7 +547,7 @@ panachrome.updateSessionAdvancedView = function(mdevice) {
 			console.log("Error in retrieving session unknown-udp "+mdevice.serial+": "+err);
 			mdevice.sessionAdvancedView.numStats = mdevice.sessionAdvancedView.numStats+1;
 			mdevice.sessionAdvancedView.lastPoll = new Date();
-			if(mdevice.sessionAdvancedView.numStats == maxNumStats) {
+			if(mdevice.sessionAdvancedView.numStats == mdevice.sessionAdvancedView.maxNumStats) {
 				mdevice.triggerDetach("sessionadvancedview:update");
 			}
 		});
