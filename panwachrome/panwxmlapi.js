@@ -132,3 +132,11 @@ panwxmlapi.getSessionApplicationCount = function(key, address, port, proto, appl
 panwxmlapi.getSessionDecryptCount = function(key, address, port, proto) {
 	return panwxmlapi.sendCmd("op", "<show><session><all><filter><ssl-decrypt>yes</ssl-decrypt><count>yes</count></filter></all></session></show>", key, address, port, proto);
 };
+panwxmlapi.getHardwareInterfaceStats = function(key, address, port, proto) {
+	// op cmd
+	// <show><system><state><filter>sys.s1.p*.detail</filter></state></system></show>
+};
+panwxmlapi.getVsysList = function(key, address, port, proto) {
+	// type=config action=get
+	// /config/devices/entry[@name='localhost.localdomain']/vsys/entry/@name
+};

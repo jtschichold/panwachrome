@@ -65,6 +65,10 @@ P.arrayOfArray = function(n) {
 	return P.arrayOf(n, function(n) { return Array.prototype.constructor(); });
 };
 
+P.sumArray = function(a) {
+	return a.reduce(function(p,c) { return p+c; }, 0);
+};
+
 // add to RSVP
 RSVP.EventTarget.triggerDetach = function(eventName, options) {
 	var self = this;

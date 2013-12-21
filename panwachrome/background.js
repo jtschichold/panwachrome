@@ -379,7 +379,7 @@ panachrome.updateSessionAdvancedView = function(mdevice) {
 
 			mdevice.sessionAdvancedView.numStats = mdevice.sessionAdvancedView.numStats+1;
 			mdevice.sessionAdvancedView.lastPoll = new Date();
-			mdevice.sessionAdvancedView.active = $result.find("member").text();
+			mdevice.sessionAdvancedView.active = $.map($result.find('member'), function(x, i) { return +x.textContent; });
 
 			if(mdevice.sessionAdvancedView.numStats == maxNumStats) {
 				mdevice.triggerDetach("sessionadvancedview:update");
@@ -399,7 +399,7 @@ panachrome.updateSessionAdvancedView = function(mdevice) {
 
 			mdevice.sessionAdvancedView.numStats = mdevice.sessionAdvancedView.numStats+1;
 			mdevice.sessionAdvancedView.lastPoll = new Date();
-			mdevice.sessionAdvancedView.closed = $result.find("member").text();
+			mdevice.sessionAdvancedView.closed = $.map($result.find('member'), function(x, i) { return +x.textContent; });
 
 			if(mdevice.sessionAdvancedView.numStats == maxNumStats) {
 				mdevice.triggerDetach("sessionadvancedview:update");
@@ -419,7 +419,7 @@ panachrome.updateSessionAdvancedView = function(mdevice) {
 
 			mdevice.sessionAdvancedView.numStats = mdevice.sessionAdvancedView.numStats+1;
 			mdevice.sessionAdvancedView.lastPoll = new Date();
-			mdevice.sessionAdvancedView.closing = $result.find("member").text();
+			mdevice.sessionAdvancedView.closing = $.map($result.find('member'), function(x, i) { return +x.textContent; });
 
 			if(mdevice.sessionAdvancedView.numStats == maxNumStats) {
 				mdevice.triggerDetach("sessionadvancedview:update");
@@ -439,7 +439,7 @@ panachrome.updateSessionAdvancedView = function(mdevice) {
 
 			mdevice.sessionAdvancedView.numStats = mdevice.sessionAdvancedView.numStats+1;
 			mdevice.sessionAdvancedView.lastPoll = new Date();
-			mdevice.sessionAdvancedView.discard = $result.find("member").text();
+			mdevice.sessionAdvancedView.discard = $.map($result.find('member'), function(x, i) { return +x.textContent; });
 
 			if(mdevice.sessionAdvancedView.numStats == maxNumStats) {
 				mdevice.triggerDetach("sessionadvancedview:update");
@@ -459,7 +459,7 @@ panachrome.updateSessionAdvancedView = function(mdevice) {
 
 			mdevice.sessionAdvancedView.numStats = mdevice.sessionAdvancedView.numStats+1;
 			mdevice.sessionAdvancedView.lastPoll = new Date();
-			mdevice.sessionAdvancedView.initial = $result.find("member").text();
+			mdevice.sessionAdvancedView.initial = $.map($result.find('member'), function(x, i) { return +x.textContent; });
 
 			if(mdevice.sessionAdvancedView.numStats == maxNumStats) {
 				mdevice.triggerDetach("sessionadvancedview:update");
@@ -479,7 +479,7 @@ panachrome.updateSessionAdvancedView = function(mdevice) {
 
 			mdevice.sessionAdvancedView.numStats = mdevice.sessionAdvancedView.numStats+1;
 			mdevice.sessionAdvancedView.lastPoll = new Date();
-			mdevice.sessionAdvancedView.opening = $result.find("member").text();
+			mdevice.sessionAdvancedView.opening = $.map($result.find('member'), function(x, i) { return +x.textContent; });
 
 			if(mdevice.sessionAdvancedView.numStats == maxNumStats) {
 				mdevice.triggerDetach("sessionadvancedview:update");
@@ -499,7 +499,7 @@ panachrome.updateSessionAdvancedView = function(mdevice) {
 
 			mdevice.sessionAdvancedView.numStats = mdevice.sessionAdvancedView.numStats+1;
 			mdevice.sessionAdvancedView.lastPoll = new Date();
-			mdevice.sessionAdvancedView.decrypt = $result.find("member").text();
+			mdevice.sessionAdvancedView.decrypt = $.map($result.find('member'), function(x, i) { return +x.textContent; });
 
 			if(mdevice.sessionAdvancedView.numStats == maxNumStats) {
 				mdevice.triggerDetach("sessionadvancedview:update");
@@ -519,7 +519,7 @@ panachrome.updateSessionAdvancedView = function(mdevice) {
 
 			mdevice.sessionAdvancedView.numStats = mdevice.sessionAdvancedView.numStats+1;
 			mdevice.sessionAdvancedView.lastPoll = new Date();
-			mdevice.sessionAdvancedView.unknowntcp = $result.find("member").text();
+			mdevice.sessionAdvancedView.unknowntcp = $.map($result.find('member'), function(x, i) { return +x.textContent; });
 
 			if(mdevice.sessionAdvancedView.numStats == maxNumStats) {
 				mdevice.triggerDetach("sessionadvancedview:update");
@@ -539,7 +539,7 @@ panachrome.updateSessionAdvancedView = function(mdevice) {
 
 			mdevice.sessionAdvancedView.numStats = mdevice.sessionAdvancedView.numStats+1;
 			mdevice.sessionAdvancedView.lastPoll = new Date();
-			mdevice.sessionAdvancedView.unknownudp = $result.find("member").text();
+			mdevice.sessionAdvancedView.unknownudp = $.map($result.find('member'), function(x, i) { return +x.textContent; });
 
 			if(mdevice.sessionAdvancedView.numStats == maxNumStats) {
 				mdevice.triggerDetach("sessionadvancedview:update");

@@ -169,17 +169,17 @@
 		var ssv = mdevice.sessionAdvancedView;
 
 		ihtml.push("<tr>");
-		ihtml.push('<td><div class="stats-label">active</div><div class="stats-figure">'+(ssv ? numformatter(ssv.active) : "--")+'</div></td>');
-		ihtml.push('<td><div class="stats-label">closed</div><div class="stats-figure">'+(ssv ? numformatter(ssv.closed) : "--")+'</div></td>');
-		ihtml.push('<td><div class="stats-label">closing</div><div class="stats-figure">'+(ssv ? numformatter(ssv.closing) : "--")+'</div></td>');
-		ihtml.push('<td><div class="stats-label">discard</div><div class="stats-figure">'+(ssv ? numformatter(ssv.discard) : "--")+'</div></td>');
-		ihtml.push('<td><div class="stats-label">initial</div><div class="stats-figure">'+(ssv ? numformatter(ssv.initial) : "--")+'</div></td>');
-		ihtml.push('<td><div class="stats-label">opening</div><div class="stats-figure">'+(ssv ? numformatter(ssv.opening) : "--")+'</div></td>');
+		ihtml.push('<td><div class="stats-label">active</div><div class="stats-figure">'+(ssv ? numformatter(P.sumArray(ssv.active)) : "--")+'</div></td>');
+		ihtml.push('<td><div class="stats-label">closed</div><div class="stats-figure">'+(ssv ? numformatter(P.sumArray(ssv.closed)) : "--")+'</div></td>');
+		ihtml.push('<td><div class="stats-label">closing</div><div class="stats-figure">'+(ssv ? numformatter(P.sumArray(ssv.closing)) : "--")+'</div></td>');
+		ihtml.push('<td><div class="stats-label">discard</div><div class="stats-figure">'+(ssv ? numformatter(P.sumArray(ssv.discard)) : "--")+'</div></td>');
+		ihtml.push('<td><div class="stats-label">initial</div><div class="stats-figure">'+(ssv ? numformatter(P.sumArray(ssv.initial)) : "--")+'</div></td>');
+		ihtml.push('<td><div class="stats-label">opening</div><div class="stats-figure">'+(ssv ? numformatter(P.sumArray(ssv.opening)) : "--")+'</div></td>');
 		ihtml.push("</tr>");
 		ihtml.push("<tr>");
-		ihtml.push('<td><div class="stats-label">decrypt</div><div class="stats-figure">'+(ssv ? numformatter(ssv.decrypt) : "--")+'</div></td>');
-		ihtml.push('<td><div class="stats-label">unknown-tcp</div><div class="stats-figure">'+(ssv ? numformatter(ssv.unknowntcp) : "--")+'</div></td>');
-		ihtml.push('<td><div class="stats-label">unknown-udp</div><div class="stats-figure">'+(ssv ? numformatter(ssv.unknownudp) : "--")+'</div></td>');
+		ihtml.push('<td><div class="stats-label">decrypt</div><div class="stats-figure">'+(ssv ? numformatter(P.sumArray(ssv.decrypt)) : "--")+'</div></td>');
+		ihtml.push('<td><div class="stats-label">unknown-tcp</div><div class="stats-figure">'+(ssv ? numformatter(P.sumArray(ssv.unknowntcp)) : "--")+'</div></td>');
+		ihtml.push('<td><div class="stats-label">unknown-udp</div><div class="stats-figure">'+(ssv ? numformatter(P.sumArray(ssv.unknownudp)) : "--")+'</div></td>');
 		ihtml.push('<td></td>');
 		ihtml.push('<td></td>');
 		ihtml.push('<td></td>');
