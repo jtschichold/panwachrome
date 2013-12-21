@@ -62,7 +62,7 @@ P.arrayOf = function(n, c) {
 	return r;
 };
 P.arrayOfArray = function(n) {
-	return P.arrayOf(n, Array.prototype.constructor);
+	return P.arrayOf(n, function(n) { return Array.prototype.constructor(); });
 };
 
 // add to RSVP
