@@ -114,7 +114,7 @@ panwxmlapi.sendConfigCmd = function(action, xpath, key, address, port, proto) {
 		RSVP.EventTarget.mixin(panwxmlapi.queues[qkey]);
 		panwxmlapi.queues[qkey].on("update", panwxmlapi._sendCmdFromQueue);
 	}
-	panwxmlapi.queues[qkey].queue.push({ data: "type=config&action="+action+"&xpath="+encodeURIComponent(cmd),
+	panwxmlapi.queues[qkey].queue.push({ data: "type=config&action="+action+"&xpath="+encodeURIComponent(xpath),
 		key: key, 
 		address: address, 
 		port: port, 
@@ -158,11 +158,14 @@ panwxmlapi.getSessionApplicationCount = function(key, address, port, proto, appl
 panwxmlapi.getSessionDecryptCount = function(key, address, port, proto) {
 	return panwxmlapi.sendOpCmd("<show><session><all><filter><ssl-decrypt>yes</ssl-decrypt><count>yes</count></filter></all></session></show>", key, address, port, proto);
 };
+panwxmlapi.getSessionVsysCount = function(key, address, port, proto, vsysname) {
+	return panwxmlapi.sendOpCmd("<show><session><all><filter><vsys-name>"+vsysname+"</vsys-name><count>yes</count></filter></all></session></show>", key, address, port, proto);
+};
 panwxmlapi.getHardwareInterfaceErrors = function(key, address, port, proto) {
 	// op cmd
 	// <show><system><state><filter>sys.s1.p*.detail</filter></state></system></show>
 };
 panwxmlapi.getVsysList = function(key, address, port, proto) {
-	return sendConfigCmd("get", "/config/devices/entry[@name='localhost.localdomain']/vsys/entry/@name",
+	return panwxmlapi.sendConfigCmd("get", "/config/devices/entry[@name='localhost.localdomain']/vsys/entry/@name",
 		key, address, port, proto);
 };

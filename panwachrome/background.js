@@ -365,6 +365,49 @@ panachrome.updateDpView = function(mdevice) {
 		});
 };
 
+panachrome.updateSessionPerVsysView = function(mdevice) {
+	if(!mdevice.polling)
+		return;
+	if(mdevice.sessionPerVsysView && mdevice.sessionPerVsysView.inPolling)
+		return;
+
+	mdevice.sessionPerVsysView = { numVsyses: 0, perVsys: [], inPolling: true };
+
+	panwxmlapi.getVsysList(mdevice.key, mdevice.address, mdevice.port, mdevice.proto)
+		.then(function($result) {
+			var $entries = $result.find('entry');
+			mdevice.sessionPerVsysView.numVsyses = $entries.length;
+
+			$entries.each(function(i) {
+				var vsysname = $(this).attr('name');
+				panwxmlapi.getSessionVsysCount(mdevice.key, mdevice.address, mdevice.port, mdevice.proto, vsysname)
+					.then(function($result) {
+						var count = $.map($result.find('member'), function(x, i) { return +x.textContent; });
+						mdevice.sessionPerVsysView.perVsys.push({ name: vsysname, total: count });
+						mdevice.sessionPerVsysView.lastPoll = new Date();
+						if (mdevice.sessionPerVsysView.perVsys.length == mdevice.sessionPerVsysView.numVsyses) {
+							mdevice.sessionPerVsysView.inPolling = false;
+							mdevice.triggerDetach("sessionpervsysview:update");
+						}
+					})
+					.then(null, function(err) {
+						console.log("Error in retrieving per vsys session count "+mdevice.serial+": "+err);
+						mdevice.sessionPerVsysView.perVsys.push({ name: vsysname, total: '--' });
+						mdevice.sessionPerVsysView.lastPoll = new Date();
+						if (mdevice.sessionPerVsysView.perVsys.length == mdevice.sessionPerVsysView.numVsyses) {
+							mdevice.sessionPerVsysView.inPolling = false;
+							mdevice.triggerDetach("sessionpervsysview:update");
+						}
+					});
+			});
+		})
+		.then(null, function(err) {
+			console.log("Error in retrieving vsys list "+mdevice.serial+": "+err);
+			mdevice.sessionPerVsysView.lastPoll = new Date();
+			mdevice.sessionPerVsysView.inPolling = false;
+			mdevice.triggerDetach("sessionpervsysview:update");
+		});
+};
 panachrome.updateSessionAdvancedView = function(mdevice) {
 	if(!mdevice.polling)
 		return;
@@ -1042,13 +1085,14 @@ panachrome.addMonitored = function(address, port, username, password, proto) {
 	panwxmlapi.keygen(username, password, address, port, proto)
 		.then(function(key) {
 			candidate.key = key;
-			return panwxmlapi.sendCmd("op", "<show><system><info></info></system></show>", key, address, port, proto);
+			return panwxmlapi.sendOpCmd("<show><system><info></info></system></show>", key, address, port, proto);
 		})
 		.then(function($ssi) {
 			var serial = $ssi.find("system").find("serial").text();
 			var hostname = $ssi.find("system").find("hostname").text();
 			var model = $ssi.find("system").find("model").text();
 			var swversion = $ssi.find("system").find("sw-version").text();
+			var multivsys = $ssi.find("system").find("multi-vsys").text();
 			if ((typeof serial != "string") || (serial.length > 12) || (serial.length < 11)) {
 				promise.reject("Invalid response from device, serial: "+serial);
 				return;
@@ -1066,6 +1110,7 @@ panachrome.addMonitored = function(address, port, username, password, proto) {
 			candidate.hostname = hostname;
 			candidate.model = model;
 			candidate.swversion = swversion;
+			candidate.multivsys = (multivsys == "off" ? false : true);
 
 			// default 1 DP, with pre-5.0.9 only DP0 was retrieved even on PA-5Ks. If post-5.0.9 numDPs is automatically updated 
 			// by DP resource monitor

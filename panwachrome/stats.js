@@ -187,6 +187,24 @@
 
 		return ihtml.join('');
 	};
+	var sessionPerVsysTableContents = function() {
+		var ihtml = [];
+		var spv = mdevice.sessionPerVsysView;
+
+		var row = [];
+		for(var j = 0; j < spv.perVsys.length; j++) {
+			row.push('<td><div class="stats-label">'+spv.perVsys[j].name+'</div><div class="stats-figure">'+numformatter(P.sumArray(spv.perVsys[j].total))+'</div></td>');
+			if(row.length == 6) {
+				ihtml.push('<tr>'+row.join('')+'</tr>');
+				row = [];
+			}
+		}
+		if(row.length != 0) {
+			ihtml.push('<tr>'+row.join('')+P.arrayOf(6-row.length, function(j) { return '<td></td>'; })+'</tr>');
+		}
+
+		return ihtml.join('');
+	};
 	var refreshSessionStates = function() {
 		var $ssr = $("#stats-sessions-refresh");
 		if ($ssr.hasClass("fa-spin")) 
@@ -194,15 +212,42 @@
 		$ssr.addClass("fa-spin");
 		backgroundPage.panachrome.updateSessionAdvancedView(mdevice);
 	};
+	var refreshSessionPerVsys = function() {
+		var $spvr = $("#stats-sessions-pervsys-refresh");
+		if ($spvr.hasClass("fa-spin"))
+			return;
+		$spvr.addClass("fa-spin");
+		backgroundPage.panachrome.updateSessionPerVsysView(mdevice);
+	};
 	var updateSessionAdvancedStats = function() {
+		var tc;
 		if (mdevice.sessionAdvancedView) {
-			$("#stats-sessions-states-lastpoll").text(mdevice.sessionAdvancedView.lastPoll.toLocaleString())
+			$("#stats-sessions-states-lastpoll").text(mdevice.sessionAdvancedView.lastPoll.toLocaleString());
+			tc = sessionAdvancedTableContents();
+		} else {
+			tc = "<tr><td><i>Click the refresh icon to retrieve these stats</i></td></tr>";			
 		}
-		var t = sessionAdvancedTableContents();
-		$('#stats-sessions-advanced tbody').empty().html(t);
+		$('#stats-sessions-advanced tbody').empty().html(tc);
 		
 		var $ssr = $("#stats-sessions-refresh");
 		$ssr.removeClass("fa-spin");
+	};
+	var updateSessionPerVsysStats = function() {
+		var tc;
+
+		if(mdevice.sessionPerVsysView && mdevice.sessionPerVsysView.inPolling) {
+			$("#stats-sessions-pervsys-refresh").addClass("fa-spin");
+			return;
+		}
+
+		if (mdevice.sessionPerVsysView && mdevice.sessionPerVsysView.lastPoll) {
+			$("#stats-sessions-pervsys-lastpoll").text(mdevice.sessionPerVsysView.lastPoll.toLocaleString());
+			tc = sessionPerVsysTableContents();
+		} else {
+			tc = "<tr><td><i>Click the refresh icon to retrieve these stats</i></td></tr>";
+		}
+		$("#stats-sessions-pervsys tbody").empty().html(tc);
+		$("#stats-sessions-pervsys-refresh").removeClass("fa-spin");
 	};
 	var updateSessions = function(event) {
 		if(event.type == "dpview:update") {
@@ -290,12 +335,22 @@
 		$('#main').append('<div style="display: block; clear: both;"></div>');
 
 		ihtml = [];
-		ihtml.push('<div class="mainsection"><span class="sectiontitle">SESSIONS ADVANCED STATS</span></div>');
-		ihtml.push('<div>(<i id="stats-sessions-refresh" title="refresh" class="fa fa-refresh"></i>) last poll <span id="stats-sessions-states-lastpoll">--</span></div>');
+		ihtml.push('<div class="mainsection"><span class="sectiontitle"><i class="fa fa-flask"></i> ADVANCED STATS</span></div>');
+		ihtml.push('<div>last poll <span id="stats-sessions-states-lastpoll">--</span> (<i id="stats-sessions-refresh" title="refresh" class="fa fa-refresh"></i>)</div>');
 		ihtml.push('<table id="stats-sessions-advanced"><tbody>');
 		ihtml.push('</tbody></table>');
 		$('#main').append(ihtml.join(''));
 		updateSessionAdvancedStats();
+
+		if (mdevice.multivsys) {
+			ihtml = [];
+			ihtml.push('<div class="mainsection"><span class="sectiontitle"><i class="fa fa-flask"></i> PER-VSYS</span></div>');
+			ihtml.push('<div>last poll <span id="stats-sessions-pervsys-lastpoll">--</span> (<i id="stats-sessions-pervsys-refresh" title="refresh" class="fa fa-refresh"></i>)</div>');
+			ihtml.push('<table id="stats-sessions-pervsys"><tbody>');
+			ihtml.push('</tbody></table>');
+			$('#main').append(ihtml.join(''));
+			updateSessionPerVsysStats();
+		}
 
 		$('#stats-sessions-refresh').on('click', refreshSessionStates);
 		$('#stats-sessions-current').on('click', '.chartable', showTCSessionsCurrent);
@@ -304,6 +359,11 @@
 		eventproxy.on("countersview:update", updateSessions);
 		eventproxy.on("sessioninfoview:update", updateSessions);
 		eventproxy.on("sessionadvancedview:update", updateSessionAdvancedStats);
+
+		if (mdevice.multivsys) {
+			$('#stats-sessions-pervsys-refresh').on('click', refreshSessionPerVsys);
+			eventproxy.on("sessionpervsysview:update", updateSessionPerVsysStats);
+		}
 	};
 
 	// Resources
@@ -1174,6 +1234,7 @@
 		eventproxy.off("ifsview:update");
 		eventproxy.off("sessioninfoview:update");
 		eventproxy.off("sessionadvancedview:update");
+		eventproxy.off("sessionpervsysview:update");
 	};
 	var initEventProxy = function() {
 		// setup the event proxy
@@ -1245,6 +1306,7 @@
 		mdevice.on("dpview:update", deviceUpdateHandler);
 		mdevice.on("cpview:update", deviceUpdateHandler);
 		mdevice.on("sessionadvancedview:update", deviceUpdateHandler);
+		mdevice.on("sessionpervsysview:update", deviceUpdateHandler);
 		$(w).bind('beforeunload', function() {
 			cancelAnimationFrame(cdownRAFID);
 
@@ -1254,6 +1316,7 @@
 			mdevice.off('dpview:update', deviceUpdateHandler);
 			mdevice.off('cpview:update', deviceUpdateHandler);
 			mdevice.off("sessionadvancedview:update", deviceUpdateHandler);
+			mdevice.off("sessionpervsysview:update", deviceUpdateHandler);
 			cleanEventProxy();
 			eventproxy = null;
 			RSVP.shutdown();
