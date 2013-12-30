@@ -365,6 +365,47 @@ panachrome.updateDpView = function(mdevice) {
 		});
 };
 
+panachrome.updateHwIfDetailsView = function(mdevice) {
+	if(!mdevice.polling)
+		return;
+	if(mdevice.hwifdetailsView && mdevice.hwifdetailsView.inPolling)
+		return;
+
+	mdevice.hwifdetailsView = { inPolling: true };
+
+	panwxmlapi.getHardwareInterfaceErrors(mdevice.key, mdevice.address, mdevice.port, mdevice.proto)
+		.then(function($result) {
+			var toks, vals, cif;
+
+			mdevice.hwifdetailsView.hwifs = {};
+
+			var ifs = $result.text().split('\n');
+			for(var j = 0; j < ifs.length; j++) {
+				if (ifs[j].length == 0)
+					continue;
+				cif = {};
+				toks = ifs[j].split("{");
+				vals = toks[1].replace(/[\'{},]/g, '').replace(/^\s+|\s+$/g, '').replace(/\:\s/g,':').split(" ");
+				for(var k = 0; k < vals.length; k++) {
+					var t = vals[k].split(":");
+					if (t.length != 2)
+						continue;
+					cif[t[0]] = parseInt(t[1]);
+				}
+				console.log(cif);
+				mdevice.hwifdetailsView.hwifs["p"+(j+1)] = cif;
+			}
+			mdevice.hwifdetailsView.lastPoll = new Date();
+			mdevice.hwifdetailsView.inPolling = false;
+			mdevice.triggerDetach('hwifdetailsview:update');
+		})
+		.then(null, function(err) {
+			console.log("Error in retrieving hardware interface errors for "+mdevice.serial+": "+err);
+			mdevice.hwifdetailsView.lastPoll = new Date();
+			mdevice.hwifdetailsView.inPolling = false;
+			mdevice.triggerDetach('hwifdetailsview:update');
+		});
+};
 panachrome.updateSessionPerVsysView = function(mdevice) {
 	if(!mdevice.polling)
 		return;

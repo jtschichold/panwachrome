@@ -384,6 +384,13 @@ input.logininput {
 #stats-sessions-pervsys-refresh {
 	cursor: pointer;
 }
+.hwifdetails {
+	cursor: pointer;
+	color: #aaa;
+}
+.hwifdetails:hover {
+	text-decoration: underline;
+}
 #stats-sessions-deny {
 	width: 465px;
 	height: 200px;
@@ -612,6 +619,14 @@ input.logininput {
 }
 #tc-hchart-tbar {
 	margin-bottom: 10px;
+}
+#hwifdetails-table {
+	width: 100%;
+	border-collapse: collapse;
+	margin-top: 20px;
+}
+#hwifdetails-table td {
+	border-bottom: 1px solid #eee;
 }
 .horizonflot {
 	border-top: 1px solid #ddd;

@@ -162,8 +162,8 @@ panwxmlapi.getSessionVsysCount = function(key, address, port, proto, vsysname) {
 	return panwxmlapi.sendOpCmd("<show><session><all><filter><vsys-name>"+vsysname+"</vsys-name><count>yes</count></filter></all></session></show>", key, address, port, proto);
 };
 panwxmlapi.getHardwareInterfaceErrors = function(key, address, port, proto) {
-	// op cmd
-	// <show><system><state><filter>sys.s1.p*.detail</filter></state></system></show>
+	return panwxmlapi.sendOpCmd("<show><system><state><filter>sys.s1.p*.detail</filter></state></system></show>",
+		key, address, port, proto);
 };
 panwxmlapi.getVsysList = function(key, address, port, proto) {
 	return panwxmlapi.sendConfigCmd("get", "/config/devices/entry[@name='localhost.localdomain']/vsys/entry/@name",

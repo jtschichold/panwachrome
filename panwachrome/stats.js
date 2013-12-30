@@ -781,6 +781,65 @@
 	};
 	
 	// Traffic
+	var refreshHwIfDetails = function(evt) {
+		console.log("refreshHwIfDetails");
+		evt.stopPropagation();
+
+		backgroundPage.panachrome.updateHwIfDetailsView(mdevice);
+		$('#hwifdetails-refresh').addClass('fa-spin');
+	};
+	var updateHwIfDetails = function() {
+		if ($('#tc-overlay').is(':hidden'))
+			return;
+		if ($('#tc-chart').attr('data-type') != 'hwifdetails')
+			return;
+		var hwifidx = +$('#tc-chart').attr('data-params');
+
+		if (typeof mdevice.hwifdetailsView == 'undefined')
+			return;
+
+		$('#hwifdetails-lastpoll').text(mdevice.hwifdetailsView.lastPoll.toLocaleString());
+
+		var ihtml = [];
+		if(mdevice.hwifdetailsView.hwifs.hasOwnProperty("p"+hwifidx)) {
+			for(var prop in mdevice.hwifdetailsView.hwifs["p"+hwifidx]) {
+				if(!mdevice.hwifdetailsView.hwifs["p"+hwifidx].hasOwnProperty(prop))
+					continue;
+				ihtml.push('<tr><td>'+prop+'</td><td>'+numformatter(mdevice.hwifdetailsView.hwifs["p"+hwifidx][prop])+'</td></tr>');
+			}
+		}
+		if(ihtml.length == 0) {
+			ihtml.push("<tr><td><i>No detailed hardware counters for this interface</i></td></tr>")
+		}
+
+		$("#hwifdetails-table tbody").empty().html(ihtml.join(''));
+
+		if (mdevice.hwifdetailsView.inPolling) {
+			$('#hwifdetails-refresh').addClass('fa-spin');
+		} else {
+			$('#hwifdetails-refresh').removeClass('fa-spin');
+		}
+	};
+	var showHwIfDetails = function() {
+		$containermenu.removeClass('containermenu-show');
+
+		var $this = $(this);
+		var hwifidx = $this.attr('data-hwifidx');
+
+		$('#tc-title').html('<i class="fa fa-flask"></i> ethernet1/'+hwifidx+' hardware details');
+		$('#tc-overlay').show();
+
+		var ihtml = [];
+		ihtml.push('<div>last poll: <span id="hwifdetails-lastpoll">--</span>  (<i id="hwifdetails-refresh" class="fa fa-refresh"></i>)</div>');
+		ihtml.push('<table id="hwifdetails-table"><tbody></tbody></table>');
+		$('#tc-chart').html(ihtml.join(''));
+		$('#tc-chart').attr('data-type', 'hwifdetails');
+		$('#tc-chart').attr('data-params', ''+hwifidx);
+
+		updateHwIfDetails();
+
+		$('#hwifdetails-refresh').on('click', refreshHwIfDetails);
+	};
 	var ifsHwTableContents = function() {
 		var ihtml = [];
 		if(typeof mdevice.ifsView != "undefined") {
@@ -788,7 +847,7 @@
 				var cc = mdevice.ifsView.hw[j];
 				var ifinfo = mdevice.interfaces.hw[cc.name] || {state: '--', mode: '--', duplex: '--', speed: '--'}; // XXX sometime ifinfo is undefined (ifs changed due to commit)
 				var mode = ifinfo.mode || "--"; // in 4.1 .mode not supported
-				ihtml.push('<tr><td rowspan="2">'+cc.name+'</td><td rowspan="2">'+ifinfo.state+'/'+mode+'/'+ifinfo.duplex+'/'+ifinfo.speed+'</td><td class="noborder chartable" data-aname="hw.ibytes.rate"> RX '+itformatter(cc.ibytes.rate*8)+'bps</td><td class="noborder chartable" data-aname="hw.ipackets.rate"> RX '+itformatter(cc.ipackets.rate)+'pps</td><td rowspan="2" class="chartable" data-aname="hw.ierrors.rate">'+itformatter(cc.ierrors.rate)+'pps</td><td rowspan="2" class="chartable" data-aname="hw.idrops.rate">'+itformatter(cc.idrops.rate)+'pps</td></tr>');
+				ihtml.push('<tr><td rowspan="2">'+cc.name+'</td><td rowspan="2">'+ifinfo.state+'/'+mode+'/'+ifinfo.duplex+'/'+ifinfo.speed+(cc.name[0] == 'e' ? (' <i class="hwifdetails fa fa-gears" data-hwifidx="'+(j+1)+'"></i>') : '')+'</td><td class="noborder chartable" data-aname="hw.ibytes.rate"> RX '+itformatter(cc.ibytes.rate*8)+'bps</td><td class="noborder chartable" data-aname="hw.ipackets.rate"> RX '+itformatter(cc.ipackets.rate)+'pps</td><td rowspan="2" class="chartable" data-aname="hw.ierrors.rate">'+itformatter(cc.ierrors.rate)+'pps</td><td rowspan="2" class="chartable" data-aname="hw.idrops.rate">'+itformatter(cc.idrops.rate)+'pps</td></tr>');
 				ihtml.push('<tr><td class="chartable" data-aname="hw.obytes.rate"> TX '+itformatter(cc.obytes.rate*8)+'bps</td><td class="chartable" data-aname="hw.opackets.rate"> TX '+itformatter(cc.opackets.rate)+'pps</td></tr>');
 			}
 		} else {
@@ -953,10 +1012,12 @@
 		$('#main').append(ihtml.join(''));
 		
 		$('#stats-ifs-hw').on('click', '.chartable', showTCIfs);
+		$('#stats-ifs-hw').on('click', '.hwifdetails', showHwIfDetails);
 		$('#stats-ifs-ifnet').on('click', '.chartable', showTCIfs);
 
 		eventproxy.on("sessioninfoview:update", updateIfs);
 		eventproxy.on("ifsview:update", updateIfs);
+		eventproxy.on("hwifdetailsview:update", updateHwIfDetails);
 	};
 	
 	// Counters
@@ -1235,6 +1296,7 @@
 		eventproxy.off("sessioninfoview:update");
 		eventproxy.off("sessionadvancedview:update");
 		eventproxy.off("sessionpervsysview:update");
+		eventproxy.off("hwifdetailsview:update");
 	};
 	var initEventProxy = function() {
 		// setup the event proxy
@@ -1307,6 +1369,7 @@
 		mdevice.on("cpview:update", deviceUpdateHandler);
 		mdevice.on("sessionadvancedview:update", deviceUpdateHandler);
 		mdevice.on("sessionpervsysview:update", deviceUpdateHandler);
+		mdevice.on("hwifdetailsview:update", deviceUpdateHandler);
 		$(w).bind('beforeunload', function() {
 			cancelAnimationFrame(cdownRAFID);
 
@@ -1317,6 +1380,7 @@
 			mdevice.off('cpview:update', deviceUpdateHandler);
 			mdevice.off("sessionadvancedview:update", deviceUpdateHandler);
 			mdevice.off("sessionpervsysview:update", deviceUpdateHandler);
+			mdevice.off("hwifdetailsview:update", deviceUpdateHandler);
 			cleanEventProxy();
 			eventproxy = null;
 			RSVP.shutdown();
@@ -1353,6 +1417,8 @@
 			showSection(URI(d.location.href).fragment());
 		});
 		$('#tc-overlay').on('click', function() {
+			console.log("tc-overlay click");
+
 			$('#tc-chart canvas.base').parent().each(function() {
 				var p = $(this).data('plot');
 				if(p) {
@@ -1364,6 +1430,8 @@
 			$('#tc-chart').attr('style','');
 			$('#tc-chart-wrap').attr('style','');
 			$('#tc-chart').empty();
+			$('#tc-chart').removeAttr('data-type');
+			$('#tc-chart').removeAttr('data-params');
 
 			$(this).hide();
 		});
