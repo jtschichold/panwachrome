@@ -1,4 +1,4 @@
-/* Released under MIT License by Luigi Mori. January 2013 */
+/*! Released under MIT License by Luigi Mori. January 2013 */
 
 (function(d,w,u) {
 	var mdevice;
