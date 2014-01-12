@@ -391,6 +391,9 @@ input.logininput {
 .hwifdetails:hover {
 	text-decoration: underline;
 }
+#hwifdetails-refresh {
+	cursor: pointer;
+}
 #stats-sessions-deny {
 	width: 465px;
 	height: 200px;
