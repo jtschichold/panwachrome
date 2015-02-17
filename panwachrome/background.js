@@ -721,6 +721,9 @@ panachrome.ifsMonitorFactory = function(mdevice) {
 */
 
 				var $ifnetentries = $result.children('ifnet').children('entry');
+				if ($ifnetentries.length == 0) {
+					$ifnetentries = $result.children('ifnet').children('ifnet').children('entry');
+				}
 				$ifnetentries.each(function() {
 					var $t = $(this);
 					var i = {};
@@ -787,6 +790,9 @@ panachrome.ifsMonitorFactory = function(mdevice) {
 							
 							// ifnet
 							var $ifnetentries = $res2.children('ifnet').children('entry');
+							if($ifnetentries.length == 0) {
+								$ifnetentries = $res2.children('ifnet').children('ifnet').children('entry');
+							}
 							$ifnetentries.each(function() {
 								var $t = $(this);
 								var i = {};
@@ -1134,7 +1140,7 @@ panachrome.addMonitored = function(address, port, username, password, proto) {
 			var model = $ssi.find("system").find("model").text();
 			var swversion = $ssi.find("system").find("sw-version").text();
 			var multivsys = $ssi.find("system").find("multi-vsys").text();
-			if ((typeof serial != "string") || (serial.length > 12) || (serial.length < 11)) {
+			if ((typeof serial != "string") && (((serial.length > 12) || (serial.length < 11)) || (serial == 'unknown'))) {
 				promise.reject("Invalid response from device, serial: "+serial);
 				return;
 			}

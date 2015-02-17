@@ -10,7 +10,7 @@ panwstatsdb.StatsDb = function(serial) {
 panwstatsdb.StatsDb.prototype.open = function() {
 	var promise = new RSVP.Promise();
 	var self = this;
-	var req = window.webkitIndexedDB.open(this.dbname);
+	var req = window.indexedDB.open(this.dbname);
 	req.onsuccess = function(event) {
 		self.db = event.target.result;
 		console.log("db-version:"+self.db.version);
@@ -75,7 +75,7 @@ panwstatsdb.StatsDb.prototype.add = function(ostore, value) {
 };
 panwstatsdb.StatsDb.prototype.shutdown = function() {
 	this.db.close();
-	var req = window.webkitIndexedDB.deleteDatabase(this.dbname);
+	var req = window.indexedDB.deleteDatabase(this.dbname);
 	req.onblocked = function(event) {
 		console.log("shutdown onblocked: "+event);
 	};
@@ -121,7 +121,7 @@ panwstatsdb.StatsDb.prototype.eachLast60Minutes = function(ostore, callback) {
 	
 	var now = new Date().getTime();
 	var nv = 0;
-	var req = objectStore.openCursor(window.webkitIDBKeyRange.bound(now-(3600*1000), now, true, true), 'prev'/*window.webkitIDBCursor.PREV*/);
+	var req = objectStore.openCursor(window.IDBKeyRange.bound(now-(3600*1000), now, true, true), 'prev'/*window.webkitIDBCursor.PREV*/);
 	req.onerror = function(err) {
 		promise.reject("Error in opening cursor on "+ostore+": "+err);
 	};
@@ -169,12 +169,12 @@ panwstatsdb.StatsDb.prototype.mapLast60Minutes = function(ostore, callback, labe
 	return promise;
 };
 panwstatsdb.deleteAll = function() {
-	var req = window.webkitIndexedDB.webkitGetDatabaseNames();
+	var req = window.indexedDB.webkitGetDatabaseNames();
 	req.onsuccess = function(event) {
 		var res = event.target.result;
 		for(var j = 0; j < res.length; j++) {
 			console.log("deleting "+res[j]);
-			var reqdd = window.webkitIndexedDB.deleteDatabase(res[j]);
+			var reqdd = window.indexedDB.deleteDatabase(res[j]);
 			reqdd.onsuccess = function(event) {
 				console.log("database deleted: "+j);
 			};

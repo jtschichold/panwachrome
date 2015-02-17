@@ -109,6 +109,7 @@
 		}
 		$.plot($("#stats-sessions-hchart"), values, {
 			series: { lines: { show: true, fill: true }, points: { show: false } },
+			legend: { position: 'nw' },
 			yaxis: { tickFormatter: percentformatter, tickDecimals: 0, minTickSize: 1, min: 0, max: 100 },
 			xaxis: { timezone: "browser", mode: "time" },
 			colors: ["rgb(246, 212, 122)", "rgb(167, 172, 140)", "rgb(83, 94, 114)"]
@@ -405,15 +406,26 @@
 		$swap.data('easyPieChart').update(Math.round(swapusage));
 		$swap.find('.stats-figure').text(percentformatter(swapusage));
 	};
+	var numDpToDpName = function(numdp) {
+		var t = [];
+
+		for(var x in mdevice.dpView) {
+			if(typeof mdevice.dpView[x] == 'object') {
+				t.push(x);
+			}
+		}
+		t.sort();
+		return t[numdp];
+	};
 	var updateResourcesDpcpuTable = function(numdp) {
-		var $dpcharts = $('#stats-resources-dpcpu'+numdp+' .dppiechart');
-		var numcores = mdevice.dpView['dp'+numdp].second.core[0].length;
+		var $dpcharts = $('#stats-resources-dpcpu'+numDpToDpName(numdp)+' .dppiechart');
+		var numcores = mdevice.dpView[numDpToDpName(numdp)].second.core[0].length;
 		var dpvalues = P.arrayOfArray($dpcharts.length);
 		var cpc = 32/$dpcharts.length;
 
 		for(var j = 0; j < 32; j++) {
 			if(j < numcores) {
-				dpvalues[Math.floor(j/cpc)].push(mdevice.dpView['dp'+numdp].second.core[0][j]);
+				dpvalues[Math.floor(j/cpc)].push(mdevice.dpView[numDpToDpName(numdp)].second.core[0][j]);
 			} else {
 				dpvalues[Math.floor(j/cpc)].push(Number.NaN);
 			}
@@ -424,12 +436,12 @@
 	};
 	var resourcesDpcpuTableContents = function(numdp) {
 		var ihtml = [];
-		var numcores = mdevice.dpView['dp'+numdp].second.core[0].length;
+		var numcores = mdevice.dpView[numDpToDpName(numdp)].second.core[0].length;
 
-		ihtml.push('<td><div class="stats-label">core 0-7</div><div class="dppiechart chartable" data-percent="0,0,0,0,0,0,0,0" data-aname="dp'+numdp+'.core0"></div></td>');
-		ihtml.push('<td><div class="stats-label'+(numcores > 8 ? '': ' stats-disabled')+'">core 8-15</div><div class="dppiechart chartable" data-percent="0,0,0,0,0,0,0,0" data-aname="dp'+numdp+'.core8"></div></td>');
-		ihtml.push('<td><div class="stats-label'+(numcores > 16 ? '': ' stats-disabled')+'">core 16-23</div><div class="dppiechart chartable" data-percent="0,0,0,0,0,0,0,0" data-aname="dp'+numdp+'.core16"></div></td>');
-		ihtml.push('<td><div class="stats-label'+(numcores > 24 ? '': ' stats-disabled')+'">core 24-31</div><div class="dppiechart chartable" data-percent="0,0,0,0,0,0,0,0" data-aname="dp'+numdp+'.core31"></div></td>');
+		ihtml.push('<td><div class="stats-label">core 0-7</div><div class="dppiechart chartable" data-percent="0,0,0,0,0,0,0,0" data-aname="'+numDpToDpName(numdp)+'.core0"></div></td>');
+		ihtml.push('<td><div class="stats-label'+(numcores > 8 ? '': ' stats-disabled')+'">core 8-15</div><div class="dppiechart chartable" data-percent="0,0,0,0,0,0,0,0" data-aname="dp'+numDpToDpName(numdp)+'.core8"></div></td>');
+		ihtml.push('<td><div class="stats-label'+(numcores > 16 ? '': ' stats-disabled')+'">core 16-23</div><div class="dppiechart chartable" data-percent="0,0,0,0,0,0,0,0" data-aname="dp'+numDpToDpName(numdp)+'.core16"></div></td>');
+		ihtml.push('<td><div class="stats-label'+(numcores > 24 ? '': ' stats-disabled')+'">core 24-31</div><div class="dppiechart chartable" data-percent="0,0,0,0,0,0,0,0" data-aname="dp'+numDpToDpName(numdp)+'.core31"></div></td>');
 
 		return ihtml.join('');
 	};
@@ -452,13 +464,13 @@
 	var updateResourcesDpLoadHistoryChart = function(numdp) {
 		var j;
 		var values = [];
-		var rsel = $('#stats-resources-dp'+numdp+'load-hchart-tbar').children('.stats-hchart-rsel').attr('data-range');
+		var rsel = $('#stats-resources-'+numDpToDpName(numdp)+'load-hchart-tbar').children('.stats-hchart-rsel').attr('data-range');
 		if(typeof rsel == "undefined" || rsel === "") {
 			rsel = "second";
 		}
 
 		var rdelta = rdeltas[rsel];
-		var core = mdevice.dpView["dp"+numdp][rsel].core;
+		var core = mdevice.dpView[numDpToDpName(numdp)][rsel].core;
 
 		if(rsel == 'second') {
 			var lastn;
@@ -476,66 +488,75 @@
 				values[1].data.push([mdevice.dpView.date-rdelta*j, P.camelMax(core[j])]);
 			}
 		}
-		$.plot($("#stats-resources-dp"+numdp+"load"), values, {
+		$.plot($("#stats-resources-"+numDpToDpName(numdp)+"load"), values, {
 			series: { lines: { show: true, fill: true }, points: { show: false } },
+			legend: { position: 'nw' },
 			yaxis: { tickFormatter: percentformatter, tickDecimals: 0, minTickSize: 1, min: 0, max: 100 },
 			xaxis: { timezone: "browser", mode: "time" },
 			colors: ["rgb(246, 212, 122)", "rgb(167, 172, 140)", "rgb(83, 94, 114)"]
 		});
 	};
 	var updateResourcesDpResHistoryChart = function(numdp) {
-		var pblastn, pdlastn, pdoclastn, j;
+		var reslastn, j, data;
 		var values = [];
-		var rsel = $('#stats-resources-dp'+numdp+'res-hchart-tbar').children('.stats-hchart-rsel').attr('data-range');
+		var rsel = $('#stats-resources-'+numDpToDpName(numdp)+'res-hchart-tbar').children('.stats-hchart-rsel').attr('data-range');
 		if(typeof rsel == "undefined" || rsel === "") {
 			rsel = "second";
 		}
 
 		var rdelta = rdeltas[rsel];
-		var res = mdevice.dpView['dp'+numdp][rsel].res;
+		var res = mdevice.dpView[numDpToDpName(numdp)][rsel].res;
+		var reslastn = {};
 
 		if(rsel == 'second') {
 			for(j = 0; j < res.length; j++) {
 				if(res[j].name == "packet buffer") {
-					pblastn = res[j].lastn;
+					reslastn['pb'] = res[j].lastn;
 					continue;
 				}
 				if(res[j].name == "packet descriptor") {
-					pdlastn = res[j].lastn;
+					reslastn['pd'] = res[j].lastn;
 					continue;
 				}
 				if(res[j].name == "packet descriptor (on-chip)") {
-					pdoclastn = res[j].lastn;
+					reslastn['pd oc'] = res[j].lastn;
+					continue;
+				}
+				if(res[j].name == 'sw tags descriptor') {
+					reslastn['std'] = res[j].lastn;
 					continue;
 				}
 			}
 		} else {
 			for(j = 0; j < res.length; j++) {
 				if(res[j].name == "packet buffer (maximum)") {
-					pblastn = res[j].lastn;
+					reslastn['pb'] = res[j].lastn;
 					continue;
 				}
 				if(res[j].name == "packet descriptor (maximum)") {
-					pdlastn = res[j].lastn;
+					reslastn['pd'] = res[j].lastn;
 					continue;
 				}
 				if(res[j].name == "packet descriptor (on-chip) (maximum)") {
-					pdoclastn = res[j].lastn;
+					reslastn['pd oc'] = res[j].lastn;
+					continue;
+				}
+				if(res[j].name == 'sw tags descriptor (maximum)') {
+					reslastn['std'] = res[j].lastn;
 					continue;
 				}
 			}
 		}
 
-		values.push({ label: "pb", data: []});
-		values.push({ label: "pd", data: []});
-		values.push({ label: "pd oc", data: []});
-		for(j = 0; j < pblastn.length; j++) {
-			values[0].data.push([mdevice.dpView.date-rdelta*j, pblastn[j]]);
-			values[1].data.push([mdevice.dpView.date-rdelta*j, pdlastn[j]]);
-			values[2].data.push([mdevice.dpView.date-rdelta*j, pdoclastn[j]]);
+		for(var resstat in reslastn) {
+			data = [];
+			for(j = 0; j < reslastn[resstat]; j++) 
+				data.push([mdevice.dpView.date-rdelta*j, reslastn[resstat][j]]);
+			values.push({ label: resstat, data: data });
 		}
-		$.plot($("#stats-resources-dp"+numdp+"res"), values, {
+		$.plot($("#stats-resources-"+numDpToDpName(numdp)+"res"), values, {
 			series: { lines: { show: true, fill: true }, points: { show: false } },
+			legend: { position: 'nw' },
 			yaxis: { tickFormatter: percentformatter, tickDecimals: 0, minTickSize: 1, min: 0, max: 100 },
 			xaxis: { timezone: "browser", mode: "time" },
 			colors: ["rgb(246, 212, 122)", "rgb(167, 172, 140)", "rgb(83, 94, 114)"]
@@ -687,7 +708,7 @@
 		fixTCHeight(); 
 	};
 	var displayResources = function() {
-		var ihtml;
+		var ihtml, dpname;
 
 		$('#main').html('<div id="mainheader">Resources</div>');
 
@@ -724,32 +745,34 @@
 
 		for(var j = 0; j < mdevice.sysdefs.numDPs; j++) {
 			ihtml = [];
-			ihtml.push('<div class="mainsection"><span class="sectiontitle">DP'+j+' CORES LOAD</span></div>');
-			ihtml.push('<table id="stats-resources-dpcpu'+j+'" class="stats-resources-dpcpu"><tbody><tr>');
+			dpname = numDpToDpName(j);
+
+			ihtml.push('<div class="mainsection"><span class="sectiontitle">'+dpname.toUpperCase()+' CORES LOAD</span></div>');
+			ihtml.push('<table id="stats-resources-dpcpu'+dpname+'" class="stats-resources-dpcpu"><tbody><tr>');
 			ihtml.push(resourcesDpcpuTableContents(j));
 			ihtml.push('</tr></tbody></table>');
 			$('#main').append(ihtml.join(''));
 
 			ihtml = [];
 			ihtml.push('<div class="stats-col1">');
-			ihtml.push('<div class="mainsection"><span class="sectiontitle">DP'+j+' LOAD HISTORY</span></div>');
-			ihtml.push('<div data-numdp="'+j+'" id="stats-resources-dp'+j+'load-hchart-tbar" class="stats-hchart-tbar">last <span class="stats-hchart-rsel" data-range="second">60s</span> <span data-range="minute">60m</span> <span data-range="hour">24h</span> <span data-range="day">7d</span> <span data-range="week">13w</span></div>');		
-			ihtml.push('<div class="stats-hchart-half" id="stats-resources-dp'+j+'load"></div>');
+			ihtml.push('<div class="mainsection"><span class="sectiontitle">'+dpname.toUpperCase()+' LOAD HISTORY</span></div>');
+			ihtml.push('<div data-numdp="'+j+'" id="stats-resources-'+dpname+'load-hchart-tbar" class="stats-hchart-tbar">last <span class="stats-hchart-rsel" data-range="second">60s</span> <span data-range="minute">60m</span> <span data-range="hour">24h</span> <span data-range="day">7d</span> <span data-range="week">13w</span></div>');		
+			ihtml.push('<div class="stats-hchart-half" id="stats-resources-'+dpname+'load"></div>');
 			ihtml.push('</div>');
 			$('#main').append(ihtml.join(''));
 			updateResourcesDpLoadHistoryChart(j);
-			$('#stats-resources-dp'+j+'load-hchart-tbar').on('click', 'span', changeRangeSelectionResourcesDpLoad);
+			$('#stats-resources-'+dpname+'load-hchart-tbar').on('click', 'span', changeRangeSelectionResourcesDpLoad);
 
 
 			ihtml = [];
 			ihtml.push('<div class="stats-col2">');
-			ihtml.push('<div class="mainsection"><span class="sectiontitle">DP'+j+' RESOURCES HISTORY</span></div>');
-			ihtml.push('<div data-numdp="'+j+'" id="stats-resources-dp'+j+'res-hchart-tbar" class="stats-hchart-tbar">last <span class="stats-hchart-rsel" data-range="second">60s</span> <span data-range="minute">60m</span> <span data-range="hour">24h</span> <span data-range="day">7d</span> <span data-range="week">13w</span></div>');		
-			ihtml.push('<div class="stats-hchart-half" id="stats-resources-dp'+j+'res"></div>');
+			ihtml.push('<div class="mainsection"><span class="sectiontitle">'+dpname.toUpperCase()+' RESOURCES HISTORY</span></div>');
+			ihtml.push('<div data-numdp="'+j+'" id="stats-resources-'+dpname+'res-hchart-tbar" class="stats-hchart-tbar">last <span class="stats-hchart-rsel" data-range="second">60s</span> <span data-range="minute">60m</span> <span data-range="hour">24h</span> <span data-range="day">7d</span> <span data-range="week">13w</span></div>');		
+			ihtml.push('<div class="stats-hchart-half" id="stats-resources-'+dpname+'res"></div>');
 			ihtml.push('</div>');
 			$('#main').append(ihtml.join(''));
 			updateResourcesDpResHistoryChart(j);
-			$('#stats-resources-dp'+j+'res-hchart-tbar').on('click', 'span', changeRangeSelectionResourcesDpRes);
+			$('#stats-resources-'+dpname+'res-hchart-tbar').on('click', 'span', changeRangeSelectionResourcesDpRes);
 
 			$('#main').append('<div style="display: block; clear: both;"></div>');
 		}
@@ -845,6 +868,8 @@
 		if(typeof mdevice.ifsView != "undefined") {
 			for(var j = 0; j < mdevice.ifsView.hw.length; j++) {
 				var cc = mdevice.ifsView.hw[j];
+				// this is for the PA-7050, strange unnamed ifs
+				if (typeof cc.name == 'undefined') continue;
 				var ifinfo = mdevice.interfaces.hw[cc.name] || {state: '--', mode: '--', duplex: '--', speed: '--'}; // XXX sometime ifinfo is undefined (ifs changed due to commit)
 				var mode = ifinfo.mode || "--"; // in 4.1 .mode not supported
 				ihtml.push('<tr><td rowspan="2">'+cc.name+'</td><td rowspan="2">'+ifinfo.state+'/'+mode+'/'+ifinfo.duplex+'/'+ifinfo.speed+(cc.name[0] == 'e' ? (' <i class="hwifdetails fa fa-gears" data-hwifidx="'+(j+1)+'"></i>') : '')+'</td><td class="noborder chartable" data-aname="hw.ibytes.rate"> RX '+itformatter(cc.ibytes.rate*8)+'bps</td><td class="noborder chartable" data-aname="hw.ipackets.rate"> RX '+itformatter(cc.ipackets.rate)+'pps</td><td rowspan="2" class="chartable" data-aname="hw.ierrors.rate">'+itformatter(cc.ierrors.rate)+'pps</td><td rowspan="2" class="chartable" data-aname="hw.idrops.rate">'+itformatter(cc.idrops.rate)+'pps</td></tr>');
@@ -936,6 +961,8 @@
 				psum = psum+item.ifnet[j].ipackets.rate;
 			}
 			for(j = 0; j < item.hw.length; j++) {
+				// strange unnamed PA-7050 hw ifs
+				if(typeof item.hw[j].name == 'undefined') continue;
 				bhwsum = bhwsum+item.hw[j].ibytes.rate*8;
 				phwsum = phwsum+item.hw[j].ipackets.rate;
 			}
@@ -954,7 +981,8 @@
 		.then(function(nc) {
 			// $("#stats-ifs-bpschart").empty();
 			$.plot($("#stats-ifs-bpschart"), [hwbps, ifsbps, dpbps], { 
-				series: { lines: { show: true, fill: true }, points: { show: false } }, 
+				series: { lines: { show: true, fill: true }, points: { show: false } },
+				legend: { position: 'nw' },
 				yaxis: { tickFormatter: itformatter, tickDecimals: 1, minTickSize: 100 }, 
 				xaxis: { timezone: "browser", mode: "time" }, 
 				colors: ["rgb(246, 212, 122)", "rgb(167, 172, 140)", "rgb(83, 94, 114)"]
@@ -962,6 +990,7 @@
 			// $("#stats-ifs-ppschart").empty();
 			$.plot($("#stats-ifs-ppschart"), [hwpps, ifspps, dppps], { 
 				series: { lines: { show: true, fill: true }, points: { show: false } }, 
+				legend: { position: 'nw' },
 				yaxis: { tickFormatter: itformatter, tickDecimals: 1, minTickSize: 100 }, 
 				xaxis: { timezone: "browser", mode: "time" }, 
 				colors: ["rgb(246, 212, 122)", "rgb(167, 172, 140)", "rgb(83, 94, 114)"]
