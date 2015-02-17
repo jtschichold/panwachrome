@@ -62,7 +62,7 @@
 	};
 
 	var updateSessionsHistoryChart = function() {
-		var j;
+		var i, j, dpname, res, lastn, data;
 		var values = [];
 		var rsel = $('#stats-sessions-hchart-tbar').children('.stats-hchart-rsel').attr('data-range');
 		if(typeof rsel == "undefined" || rsel === "") {
@@ -70,49 +70,34 @@
 		}
 
 		var rdelta = rdeltas[rsel];
-		var res = mdevice.dpView.dp0[rsel].res;
-
+		var rname = "session (maximum)";
 		if(rsel == 'second') {
-			var lastn;
-
-			for(j = 0; j < res.length; j++) {
-				if(res[j].name == "session") {
-					lastn = res[j].lastn;
+			rname = 'session';
+		}
+		for(j = 0; j < mdevice.sysdefs.numDPs; j++) {
+			lastn = null;
+			dpname = numDpToDpName(j);
+			res = mdevice.dpView[dpname][rsel].res;
+			for(i = 0; i < res.length; i++) {
+				if(res[i].name == rname) {
+					lastn = res[i].lastn;
 					break;
 				}
 			}
+			if (!lastn) continue;
 
-			values.push([]);
-			for(j = 0; j < lastn.length; j++) {
-				values[0].push([mdevice.dpView.date-rdelta*j, lastn[j]]);
+			data = [];
+			for(i = 0; i < lastn.length; i++) {
+				data.push([mdevice.dpView.date-rdelta*i, lastn[i]])
 			}
-		} else {
-			var maxlastn, avglastn;
-
-			for(j = 0; j < res.length; j++) {
-				if(res[j].name == "session (maximum)") {
-					maxlastn = res[j].lastn;
-					continue;
-				}
-				if(res[j].name == "session (average)") {
-					avglastn = res[j].lastn;
-					continue;
-				}
-			}
-
-			values.push({ label: 'max', data: []});
-			values.push({ label: 'avg', data: []});
-			for(j = 0; j < maxlastn.length; j++) {
-				values[0].data.push([mdevice.dpView.date-rdelta*j, maxlastn[j]]);
-				values[1].data.push([mdevice.dpView.date-rdelta*j, avglastn[j]]);
-			}
+			values.push({ label: dpname+' max', data: data });
 		}
 		$.plot($("#stats-sessions-hchart"), values, {
 			series: { lines: { show: true, fill: true }, points: { show: false } },
 			legend: { position: 'nw' },
 			yaxis: { tickFormatter: percentformatter, tickDecimals: 0, minTickSize: 1, min: 0, max: 100 },
 			xaxis: { timezone: "browser", mode: "time" },
-			colors: ["rgb(246, 212, 122)", "rgb(167, 172, 140)", "rgb(83, 94, 114)"]
+			colors: ["rgb(246, 212, 122)", "rgb(167, 172, 140)", "rgb(83, 94, 114)", "rgb(190, 164, 94)", "rgb(185, 190, 155)", "rgb(139, 157, 190)"]
 		});
 	};
 	var updateSessionsCpsChart = function() {
