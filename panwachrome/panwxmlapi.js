@@ -7,6 +7,48 @@ panwxmlapi.maxRunningReq = 2;
 
 panwxmlapi.queues = {};
 
+panwxmlapi.setupCookieRemover = function() {
+	chrome.webRequest.onBeforeSendHeaders.addListener(
+		function(details) {
+        	for (var i = 0; i < details.requestHeaders.length; ++i) {
+        		if (details.requestHeaders[i].name === 'Cookie') {
+              		details.requestHeaders.splice(i, 1);
+              		break;
+            	}
+          	}
+
+			return {requestHeaders: details.requestHeaders};
+		},
+		{
+			urls: ['*://*/api/?key=*'],
+			tabId: -1
+		},
+		[
+			"blocking",
+			"requestHeaders"
+		]
+	);
+	chrome.webRequest.onHeadersReceived.addListener(
+		function(details) {
+        	for (var i = 0; i < details.responseHeaders.length; ++i) {
+        		if (details.responseHeaders[i].name === 'Set-Cookie') {
+              		details.responseHeaders.splice(i, 1);
+              		break;
+            	}
+          	}
+
+			return {responseHeaders: details.responseHeaders};
+		},
+		{
+			urls: ['*://*/api/?key=*'],
+			tabId: -1
+		},
+		[
+			"blocking",
+			"responseHeaders"
+		]
+	);
+};
 panwxmlapi.getResult = function(data) {
 	var $r = $(data).find("response");
 	if (typeof $r == "undefined") {
@@ -25,7 +67,7 @@ panwxmlapi.getResult = function(data) {
 };
 panwxmlapi.keygen = function(username, password, address, port, proto) {
 	var promise = new RSVP.Promise();
-	
+
 	$.ajax({
 		type: "GET",
 		url: proto+"://"+address+":"+port+"/api/",
@@ -41,14 +83,14 @@ panwxmlapi.keygen = function(username, password, address, port, proto) {
 		}
 		var key = $r.find("key").text();
 		console.log("Keygen: "+key);
-		promise.resolve(key); 
+		promise.resolve(key);
 	})
 	.fail(function(jqXHR, textStatus) { console.log("Keygen error: "+jqXHR.statusText); promise.reject(textStatus); });
-	
+
 	return promise;
 };
 panwxmlapi._sendCmdFromQueue = function(event) {
-	var queue = panwxmlapi.queues[event.detail]; 
+	var queue = panwxmlapi.queues[event.detail];
 	if(queue.numrunning >= panwxmlapi.maxRunningReq) {
 		return;
 	}
@@ -67,9 +109,9 @@ panwxmlapi._sendCmdFromQueue = function(event) {
 		timeout: panwxmlapi.requestTimeout
 	})
 	.done(function(data) {
-		queue.numrunning = queue.numrunning - 1; 
+		queue.numrunning = queue.numrunning - 1;
 		queue.triggerDetach("update", { detail: event.detail });
-		
+
 		var $r = panwxmlapi.getResult(data);
 		if (typeof $r != "object") {
 			request.promise.reject($r);
@@ -77,29 +119,29 @@ panwxmlapi._sendCmdFromQueue = function(event) {
 		}
 		request.promise.resolve($r);
 	})
-	.fail(function(jqXHR, textStatus) { 
-		queue.numrunning = queue.numrunning - 1; 
+	.fail(function(jqXHR, textStatus) {
+		queue.numrunning = queue.numrunning - 1;
 		queue.triggerDetach("update", { detail: event.detail });
 
-		console.log("XML API cmd error: "+jqXHR.statusText); 
-		request.promise.reject(textStatus); 
-	});	
+		console.log("XML API cmd error: "+jqXHR.statusText);
+		request.promise.reject(textStatus);
+	});
 };
 panwxmlapi.sendOpCmd = function(cmd, key, address, port, proto) {
 	var qkey = address+":"+port;
 	var promise = new RSVP.Promise();
-	
+
 	if(typeof panwxmlapi.queues[qkey] == "undefined") {
 		panwxmlapi.queues[qkey] = { queue: [], numrunning: 0 };
 		RSVP.EventTarget.mixin(panwxmlapi.queues[qkey]);
 		panwxmlapi.queues[qkey].on("update", panwxmlapi._sendCmdFromQueue);
 	}
 	panwxmlapi.queues[qkey].queue.push({ data: "type=op&cmd="+encodeURIComponent(cmd),
-		key: key, 
-		address: address, 
-		port: port, 
-		proto: proto, 
-		promise: promise 
+		key: key,
+		address: address,
+		port: port,
+		proto: proto,
+		promise: promise
 	});
 	panwxmlapi.queues[qkey].triggerDetach("update", { detail: qkey });
 
@@ -108,18 +150,18 @@ panwxmlapi.sendOpCmd = function(cmd, key, address, port, proto) {
 panwxmlapi.sendConfigCmd = function(action, xpath, key, address, port, proto) {
 	var qkey = address+":"+port;
 	var promise = new RSVP.Promise();
-	
+
 	if(typeof panwxmlapi.queues[qkey] == "undefined") {
 		panwxmlapi.queues[qkey] = { queue: [], numrunning: 0 };
 		RSVP.EventTarget.mixin(panwxmlapi.queues[qkey]);
 		panwxmlapi.queues[qkey].on("update", panwxmlapi._sendCmdFromQueue);
 	}
 	panwxmlapi.queues[qkey].queue.push({ data: "type=config&action="+action+"&xpath="+encodeURIComponent(xpath),
-		key: key, 
-		address: address, 
-		port: port, 
-		proto: proto, 
-		promise: promise 
+		key: key,
+		address: address,
+		port: port,
+		proto: proto,
+		promise: promise
 	});
 	panwxmlapi.queues[qkey].triggerDetach("update", { detail: qkey });
 

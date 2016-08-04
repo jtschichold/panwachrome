@@ -48,8 +48,8 @@ panachrome.filterJobClicked = function(nid, buttonidx) {
 	localStorage.setItem('filteredJobs', JSON.stringify(panachrome.config.filteredJobs));
 };
 panachrome.notificationCloseOnTimeout = function(nid) {
-	setTimeout(function() { 
-		chrome.notifications.clear(nid, function() {}); 
+	setTimeout(function() {
+		chrome.notifications.clear(nid, function() {});
 	}, panachrome.config.notifTimeout*1000);
 };
 panachrome.error = function(e) {
@@ -141,7 +141,7 @@ panachrome.cpMonitorFactory = function(mdevice) {
 
 				var o2store = { cpu: {}, memory: {}, swap: {} };
 				var topoutput = $result.text();
-				
+
 				var rem = topoutput.match(panachrome.cpCpure);
 				if(rem === null) {
 					console.log("Error matching cp resources with cpu re");
@@ -155,7 +155,7 @@ panachrome.cpMonitorFactory = function(mdevice) {
 					o2store.cpu.si = rem[7];
 					o2store.cpu.st = rem[8];
 				}
-				
+
 				rem = topoutput.match(panachrome.cpMemre);
 				if(rem === null) {
 					console.log('Error in matching the CP result with MEMre');
@@ -170,7 +170,7 @@ panachrome.cpMonitorFactory = function(mdevice) {
 					o2store.memory.used = ""+(u-b-c);
 					o2store.memory.free = ""+(f+b+c);
 				}
-				
+
 				rem = topoutput.match(panachrome.cpSwapre);
 				if(rem === null) {
 					console.log('Error in matching the CP result with SWAPre');
@@ -186,7 +186,7 @@ panachrome.cpMonitorFactory = function(mdevice) {
 				} else {
 					o2store.loadavg1m = rem[1];
 				}
-				
+
 				mdevice.statsdb.add("cp", o2store)
 					.then(function(msg) {
 						mdevice.triggerDetach("cp:update");
@@ -212,7 +212,7 @@ panachrome.updateCpView = function(mdevice) {
 		})
 		.then(null, function(err) {
 			console.log("Error getting last elements from cp: "+err);
-		});	
+		});
 };
 
 /*
@@ -330,13 +330,13 @@ panachrome.dpMonitorFactory = function(mdevice) {
 								co.res.push(tco);
 							});
 
-							cdpo[this.tagName] = co;						
+							cdpo[this.tagName] = co;
 						});
 
 						o2store[this.tagName] = cdpo;
 					});
 				}
-				
+
 				mdevice.statsdb.add("dp", o2store)
 					.then(function(msg) {
 						mdevice.triggerDetach("dp:update");
@@ -675,11 +675,11 @@ panachrome.updateSessionInfoView = function(mdevice) {
 		})
 		.then(null, function(err) {
 			console.log("Error getting last elements from sessioninfo: "+err);
-		});	
+		});
 };
 
 panachrome.ifsMonitorFactory = function(mdevice) {
-	return (function() {		
+	return (function() {
 		if (!mdevice.polling) {
 			return;
 		}
@@ -690,8 +690,8 @@ panachrome.ifsMonitorFactory = function(mdevice) {
 				var r1 = { ifnet: {}, hw: {} };
 				var r1date = new Date().getTime();
 				var o2store = { ifnet: [], hw: [] };
-				
-				
+
+
 /*
     <entry>
       <neighpend>0</neighpend>
@@ -771,7 +771,7 @@ panachrome.ifsMonitorFactory = function(mdevice) {
 						if (tn == 'name') {
 							n = $(this).text();
 							return;
-						} 
+						}
 						if(tn == "port") {
 							return;
 						}
@@ -779,7 +779,7 @@ panachrome.ifsMonitorFactory = function(mdevice) {
 					});
 					r1.hw[n] = i;
 				});
-				
+
 				/* 2nd call to get the rate */
 				setTimeout(function() {
 					panwxmlapi.getIfsCounters(mdevice.key, mdevice.address, mdevice.port, mdevice.proto)
@@ -787,7 +787,7 @@ panachrome.ifsMonitorFactory = function(mdevice) {
 							mdevice.lastPoll = new Date();
 
 							var dt = ((new Date().getTime())-r1date);
-							
+
 							// ifnet
 							var $ifnetentries = $res2.children('ifnet').children('entry');
 							if($ifnetentries.length == 0) {
@@ -843,7 +843,7 @@ panachrome.ifsMonitorFactory = function(mdevice) {
 								}
 								o2store.hw.push(i);
 							});
-							
+
 							mdevice.statsdb.add("ifs", o2store)
 								.then(function(msg) {
 									mdevice.triggerDetach("ifs:update");
@@ -997,7 +997,7 @@ panachrome.jobsMonitorFactory = function(mdevice) {
 					var $t = $(this);
 					var s = $t.children('status:first').text();
 					var id = parseInt($t.children('id:first').text(), 10);
-					
+
 					if(idx === 0) lji = id;
 
 					if(s != 'FIN') {
@@ -1019,7 +1019,7 @@ panachrome.jobsMonitorFactory = function(mdevice) {
 						var t = $t.children('type:first').text();
 						panachrome.showJob(id, t, r);
 
-						return;						
+						return;
 					}
 				});
 				mdevice.lastJobId = lji;
@@ -1035,14 +1035,14 @@ panachrome.initDeviceMonitors = function(mdevice) {
 	if(panachrome.config.pollingDefault == 1) {
 		mdevice.polling = true;
 	}
-	
+
 	mdevice.countersMonitor = panachrome.countersMonitorFactory(mdevice);
 	mdevice.ifsMonitor = panachrome.ifsMonitorFactory(mdevice);
 	mdevice.sessioninfoMonitor = panachrome.sessioninfoMonitorFactory(mdevice);
 	mdevice.cpMonitor = panachrome.cpMonitorFactory(mdevice);
 	mdevice.dpMonitor = panachrome.dpMonitorFactory(mdevice);
 	mdevice.jobsMonitor = panachrome.jobsMonitorFactory(mdevice);
-	
+
 	// create the intervals and call the monitors
 	mdevice.pollers = [];
 	mdevice.pollers.push(setInterval(mdevice.countersMonitor, panachrome.config.trackingInterval*1000));
@@ -1051,7 +1051,7 @@ panachrome.initDeviceMonitors = function(mdevice) {
 	setTimeout(mdevice.ifsMonitor, 0);
 	mdevice.pollers.push(setInterval(mdevice.sessioninfoMonitor, panachrome.config.trackingInterval*1000));
 	setTimeout(mdevice.sessioninfoMonitor, 0);
-	
+
 	// resources tracked at 2x the tracking interval. No special reason.
 	mdevice.pollers.push(setInterval(mdevice.cpMonitor, panachrome.config.trackingInterval*2*1000));
 	setTimeout(mdevice.cpMonitor, 0);
@@ -1060,7 +1060,7 @@ panachrome.initDeviceMonitors = function(mdevice) {
 
 	mdevice.pollers.push(setInterval(mdevice.jobsMonitor, panachrome.config.jobsTrackingInterval*1000));
 	setTimeout(mdevice.jobsMonitor, 0);
-	
+
 	mdevice.on("counters:update", function() {
 		panachrome.updateCountersView(mdevice);
 	});
@@ -1109,18 +1109,18 @@ panachrome.delMonitored = function(serial) {
 		entry = panachrome.monitored[cs];
 		if(entry.serial == serial) {
 			delete panachrome.monitored[serial];
-			
+
 			for(var j = 0; j < entry.pollers.length; j++) {
 				clearInterval(entry.pollers[j]);
 			}
-			
+
 			// shutdown the db
 			if (typeof entry.statsdb != "undefined") {
 				entry.statsdb.shutdown();
 			}
-			
+
 			panachrome.monitored.triggerDetach("delete", { detail: serial });
-			
+
 			entry = null;
 		}
 	}
@@ -1128,7 +1128,7 @@ panachrome.delMonitored = function(serial) {
 panachrome.addMonitored = function(address, port, username, password, proto) {
 	var candidate = new panachrome.mDevice(address, port, proto);
 	var promise = new RSVP.Promise();
-	
+
 	panwxmlapi.keygen(username, password, address, port, proto)
 		.then(function(key) {
 			candidate.key = key;
@@ -1159,9 +1159,9 @@ panachrome.addMonitored = function(address, port, username, password, proto) {
 			candidate.swversion = swversion;
 			candidate.multivsys = (multivsys == "off" ? false : true);
 
-			// default 1 DP, with pre-5.0.9 only DP0 was retrieved even on PA-5Ks. If post-5.0.9 numDPs is automatically updated 
+			// default 1 DP, with pre-5.0.9 only DP0 was retrieved even on PA-5Ks. If post-5.0.9 numDPs is automatically updated
 			// by DP resource monitor
-			candidate.sysdefs = { numDPs: 1 }; 
+			candidate.sysdefs = { numDPs: 1 };
 
 			// console.log(candidate);
 
@@ -1169,30 +1169,30 @@ panachrome.addMonitored = function(address, port, username, password, proto) {
 				promise.reject("Device "+serial+" is already monitored");
 				return;
 			}
-			
+
 			// create the db for the stats history
 			candidate.statsdb = new panwstatsdb.StatsDb(serial);
 			candidate.statsdb.open()
 				.then(function() {
 					RSVP.EventTarget.mixin(candidate);
-					
+
 					panachrome.initDeviceSystemInfo(candidate);
-					
+
 					panachrome.initDeviceMonitors(candidate);
-								
+
 					panachrome.monitored[serial] = candidate;
 					panachrome.monitored.triggerDetach("add", { detail: serial });
-					
+
 					promise.resolve("Device "+serial+" added to the monitor list");
 				})
 				.then(null, function(msg) {
 					promise.reject(msg);
-				});			
-		})		
+				});
+		})
 		.then(null, function(err) {
 			promise.reject(err);
 		});
-		
+
 	return promise;
 };
 panachrome.alreadyMonitoredByURL = function(url) {
@@ -1201,7 +1201,7 @@ panachrome.alreadyMonitoredByURL = function(url) {
 	var port = duri.port();
 	var proto = duri.protocol();
 	if (port === "") {
-		if(proto == "https") 
+		if(proto == "https")
 			port = "443";
 		else if(proto == "http")
 			port = "80";
@@ -1235,7 +1235,7 @@ panachrome.updateBrowserActionBadge = function() {
 
 panachrome.install = function(details) {
 	console.log("Install");
-	
+
 	// options
 	if(localStorage.getItem('notifTimeout') == null) localStorage.setItem('notifTimeout', '5');
 	if(localStorage.getItem('trackingInterval') == null) localStorage.setItem('trackingInterval', '30');
@@ -1282,7 +1282,7 @@ panachrome.setup = function() {
 				.then(panachrome.info, panachrome.error);
 		}
 	};
-	
+
 	// init the background page
 	panachrome.readConfig();
 	RSVP.EventTarget.mixin(panachrome.monitored);
@@ -1298,6 +1298,9 @@ panachrome.setup = function() {
 	panachrome.monitored.on("add", panachrome.updateBrowserActionBadge);
 	panachrome.monitored.on("delete", panachrome.updateBrowserActionBadge);
 	panachrome.monitored.on("delete", panachrome.closeMonitoredViews);
+
+	// to remove cookies from API calls
+	panwxmlapi.setupCookieRemover();
 };
 
 panachrome.setup();
