@@ -9,7 +9,6 @@ var trySSO = function() {
 	if(document.body.innerHTML.indexOf('__LOGIN_PAGE_FOR_PANORAMA_BACKWARD_COMPATIBILITY__') != -1) {
 		console.log('palo alto login page');
 		chrome.extension.sendRequest({cmd: 'isalreadymonitored'}, function(response) {
-			console.log(response);
 			if (response.result == 0) {
 				document.querySelector('#login_form').addEventListener('submit', function() {
 					if(confirm('Add to Pan(w)achrome ?')) {

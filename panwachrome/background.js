@@ -126,8 +126,11 @@ panachrome.initDeviceSystemInfo = function(mdevice) {
 };
 
 panachrome.cpCpure = /Cpu\(s\)\:\W+([0-9]+\.[0-9]+)\%us,\W+([0-9]+\.[0-9]+)\%sy,\W+([0-9]+\.[0-9]+)\%ni,\W+([0-9]+\.[0-9]+)\%id,\W+([0-9]+.[0-9]+)\%wa,\W+([0-9]+\.[0-9]+)\%hi,\W+([0-9]+\.[0-9]+)\%si,\W+([0-9]+\.[0-9]+)\%st/;
+panachrome.cpCpure9 = /%Cpu\(s\)\:\W+([0-9]+\.[0-9]+)\Wus,\W+([0-9]+\.[0-9]+)\Wsy,\W+([0-9]+\.[0-9]+)\Wni,\W+([0-9]+\.[0-9]+)\Wid,\W+([0-9]+.[0-9]+)\Wwa,\W+([0-9]+\.[0-9]+)\Whi,\W+([0-9]+\.[0-9]+)\Wsi,\W+([0-9]+\.[0-9]+)\Wst/;
 panachrome.cpMemre = /Mem:\W+[0-9]+k\W+total,\W+([0-9]+)k\W+used,\W+([0-9]+)k\W+free\W+([0-9]+)k\W+buffers[\s\S]*\W+([0-9]+)k\W+cached/;
+panachrome.cpMemre9 = /KiB\W+Mem\W+:\W+[0-9]+\W+total,\W+([0-9]+)\W+free,\W+([0-9]+)\W+used\W+([0-9]+)\W+buff\/cache/;
 panachrome.cpSwapre = /Swap:\W+[0-9]+k\W+total,\W+([0-9]+)k\W+used,\W+([0-9]+)k\W+free/;
+panachrome.cpSwapre9 = /KiB\W+Swap:\W+[0-9]+\W+total,\W+([0-9]+)\W+free,\W+([0-9]+)\W+used/;
 panachrome.cpCpuLoadAvgre = /load average: (\d+\.\d+)/;
 
 panachrome.cpMonitorFactory = function(mdevice) {
@@ -144,6 +147,9 @@ panachrome.cpMonitorFactory = function(mdevice) {
 
 				var rem = topoutput.match(panachrome.cpCpure);
 				if(rem === null) {
+					rem = topoutput.match(panachrome.cpCpure9);
+				}
+				if (rem === null) {
 					console.log("Error matching cp resources with cpu re");
 				} else {
 					o2store.cpu.us = rem[1];
@@ -157,27 +163,48 @@ panachrome.cpMonitorFactory = function(mdevice) {
 				}
 
 				rem = topoutput.match(panachrome.cpMemre);
+				var bc = 0;
+				var u = 0;
+				var f = 0;
+				if (rem) {
+					bc = parseInt(rem[3], 10) + parseInt(rem[4], 10);
+					u = parseInt(rem[1], 10) - bc;
+					f = parseInt(rem[2], 10) + bc; 
+				} else {
+					rem = topoutput.match(panachrome.cpMemre9);
+					if (rem) {
+						bc = parseInt(rem[3], 10);
+						u = parseInt(rem[2], 10);
+						f = parseInt(rem[1], 10) + bc; 	
+					}
+				}
 				if(rem === null) {
 					console.log('Error in matching the CP result with MEMre');
 				} else {
 					// Mem: 1034604k total, 1008448k used, 26156k free, 41868k buffers
 					// Swap: 2008084k total, 485268k used, 1522816k free, 109572k ...
 					// thanks JFG for the correct formula
-					var u = parseInt(rem[1], 10);
-					var f = parseInt(rem[2], 10);
-					var b = parseInt(rem[3], 10);
-					var c = parseInt(rem[4], 10);
-					o2store.memory.used = ""+(u-b-c);
-					o2store.memory.free = ""+(f+b+c);
+					o2store.memory.used = ""+u;
+					o2store.memory.free = ""+f;
 				}
 
 				rem = topoutput.match(panachrome.cpSwapre);
+				if (rem) {
+					u = rem[1];
+					f = rem[2];
+				} else {
+					rem = topoutput.match(panachrome.cpSwapre9);
+					if (rem) {
+						u = rem[2];
+						f = rem[1];
+					}
+				}
 				if(rem === null) {
 					console.log('Error in matching the CP result with SWAPre');
 				} else {
 					// Swap: 2008084k total, 485268k used, 1522816k free, 109572k ...
-					o2store.swap.used = rem[1];
-					o2store.swap.free = rem[2];
+					o2store.swap.used = u;
+					o2store.swap.free = f;
 				}
 
 				rem = topoutput.match(panachrome.cpCpuLoadAvgre);
