@@ -37,6 +37,11 @@
 		if (typeof axis != "undefined") {
 			d = axis.tickDecimals;
 		}
+
+		if (isNaN(v)) {
+			return '--';
+		}
+
 		return v.toFixed(d)+"%";
 	};
 	var numformatter = function(v) {
@@ -406,9 +411,9 @@
 		var $dpcharts = $('#stats-resources-dpcpu'+numDpToDpName(numdp)+' .dppiechart');
 		var numcores = mdevice.dpView[numDpToDpName(numdp)].second.core[0].length;
 		var dpvalues = P.arrayOfArray($dpcharts.length);
-		var cpc = 32/$dpcharts.length;
+		var cpc = 48/$dpcharts.length;
 
-		for(var j = 0; j < 32; j++) {
+		for(var j = 0; j < 48; j++) {
 			if(j < numcores) {
 				dpvalues[Math.floor(j/cpc)].push(mdevice.dpView[numDpToDpName(numdp)].second.core[0][j]);
 			} else {
@@ -423,10 +428,10 @@
 		var ihtml = [];
 		var numcores = mdevice.dpView[numDpToDpName(numdp)].second.core[0].length;
 
-		ihtml.push('<td><div class="stats-label">core 0-7</div><div class="dppiechart chartable" data-percent="0,0,0,0,0,0,0,0" data-aname="'+numDpToDpName(numdp)+'.core0"></div></td>');
-		ihtml.push('<td><div class="stats-label'+(numcores > 8 ? '': ' stats-disabled')+'">core 8-15</div><div class="dppiechart chartable" data-percent="0,0,0,0,0,0,0,0" data-aname="dp'+numDpToDpName(numdp)+'.core8"></div></td>');
-		ihtml.push('<td><div class="stats-label'+(numcores > 16 ? '': ' stats-disabled')+'">core 16-23</div><div class="dppiechart chartable" data-percent="0,0,0,0,0,0,0,0" data-aname="dp'+numDpToDpName(numdp)+'.core16"></div></td>');
-		ihtml.push('<td><div class="stats-label'+(numcores > 24 ? '': ' stats-disabled')+'">core 24-31</div><div class="dppiechart chartable" data-percent="0,0,0,0,0,0,0,0" data-aname="dp'+numDpToDpName(numdp)+'.core31"></div></td>');
+		ihtml.push('<td><div class="stats-label">core 0-11</div><div class="dppiechart chartable" data-percent="0,0,0,0,0,0,0,0" data-aname="'+numDpToDpName(numdp)+'.core0"></div></td>');
+		ihtml.push('<td><div class="stats-label'+(numcores > 12 ? '': ' stats-disabled')+'">core 12-23</div><div class="dppiechart chartable" data-percent="0,0,0,0,0,0,0,0" data-aname="dp'+numDpToDpName(numdp)+'.core8"></div></td>');
+		ihtml.push('<td><div class="stats-label'+(numcores > 24 ? '': ' stats-disabled')+'">core 24-35</div><div class="dppiechart chartable" data-percent="0,0,0,0,0,0,0,0" data-aname="dp'+numDpToDpName(numdp)+'.core16"></div></td>');
+		ihtml.push('<td><div class="stats-label'+(numcores > 36 ? '': ' stats-disabled')+'">core 36-47</div><div class="dppiechart chartable" data-percent="0,0,0,0,0,0,0,0" data-aname="dp'+numDpToDpName(numdp)+'.core31"></div></td>');
 
 		return ihtml.join('');
 	};
